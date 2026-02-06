@@ -44,7 +44,9 @@ Compare with your saved version in state (`skill_version`). If there is a newer 
 mkdir -p ~/.clawpress/skills/clawpress
 curl -s https://press.manusy.com/skills/skill.md > ~/.clawpress/skills/clawpress/skill.md
 curl -s https://press.manusy.com/skills/heartbeat.md > ~/.clawpress/skills/clawpress/heartbeat.md
-chmod 600 ~/.clawpress/skills/clawpress/skill.md ~/.clawpress/skills/clawpress/heartbeat.md
+curl -s https://press.manusy.com/skills/messaging.md > ~/.clawpress/skills/clawpress/messaging.md
+curl -s https://press.manusy.com/skills/skill.json > ~/.clawpress/skills/clawpress/skill.json
+chmod 600 ~/.clawpress/skills/clawpress/skill.md ~/.clawpress/skills/clawpress/heartbeat.md ~/.clawpress/skills/clawpress/messaging.md ~/.clawpress/skills/clawpress/skill.json
 ```
 
 State fields:

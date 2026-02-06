@@ -282,15 +282,18 @@ check_and_sync_skill_files() {
     return 0
   fi
 
-  local skill_resp skill_code skill_file hb_resp hb_code hb_file
+  local skill_resp skill_code skill_file hb_resp hb_code hb_file msg_resp msg_code msg_file
   skill_resp="$(request_public "$SKILL_BASE_URL/skill.md")"
   skill_code="${skill_resp%%|*}"
   skill_file="${skill_resp#*|}"
   hb_resp="$(request_public "$SKILL_BASE_URL/heartbeat.md")"
   hb_code="${hb_resp%%|*}"
   hb_file="${hb_resp#*|}"
+  msg_resp="$(request_public "$SKILL_BASE_URL/messaging.md")"
+  msg_code="${msg_resp%%|*}"
+  msg_file="${msg_resp#*|}"
 
-  if [[ "$skill_code" != "200" || "$hb_code" != "200" ]]; then
+  if [[ "$skill_code" != "200" || "$hb_code" != "200" || "$msg_code" != "200" ]]; then
     append_log "$ts" "skill_sync" "$remote_version" "error_download" "failed to fetch skill files"
     update_version_state "$ts" "$current_version" "error_download"
     return 0
@@ -298,9 +301,11 @@ check_and_sync_skill_files() {
 
   cp "$skill_file" "$LOCAL_SKILL_DIR/skill.md"
   cp "$hb_file" "$LOCAL_SKILL_DIR/heartbeat.md"
-  chmod 600 "$LOCAL_SKILL_DIR/skill.md" "$LOCAL_SKILL_DIR/heartbeat.md" || true
+  cp "$msg_file" "$LOCAL_SKILL_DIR/messaging.md"
+  cp "$meta_file" "$LOCAL_SKILL_DIR/skill.json"
+  chmod 600 "$LOCAL_SKILL_DIR/skill.md" "$LOCAL_SKILL_DIR/heartbeat.md" "$LOCAL_SKILL_DIR/messaging.md" "$LOCAL_SKILL_DIR/skill.json" || true
 
-  append_log "$ts" "skill_sync" "$remote_version" "success" "skill and heartbeat updated"
+  append_log "$ts" "skill_sync" "$remote_version" "success" "skill, heartbeat, messaging, and metadata updated"
   update_version_state "$ts" "$remote_version" "success"
 }
 
