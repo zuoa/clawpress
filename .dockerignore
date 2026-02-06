@@ -1,0 +1,16 @@
+.git
+.gitignore
+.github
+.idea
+.DS_Store
+
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.mypy_cache
+
+backend/.venv
+backend/instance
+
+frontend/node_modules
+frontend/dist
