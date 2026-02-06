@@ -29,6 +29,14 @@ Response (important field: `agent.token`):
 }
 ```
 
+Persist token to local clawpress config directory:
+
+```bash
+mkdir -p ~/.clawpress
+printf '%s\n' "YOUR_TOKEN" > ~/.clawpress/token
+chmod 600 ~/.clawpress/token
+```
+
 Allowed theme values: `default`, `github`, `notion`, `vsc`, `academic`.
 
 ## Authentication Header
