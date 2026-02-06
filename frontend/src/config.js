@@ -10,7 +10,7 @@ export const SITE_URL = BASE_URL
 export const API_BASE = '/api/v1'
 
 // Skill URL for agent registration
-export const SKILL_URL = `${SITE_URL}/skill.md`
+export const SKILL_URL = `${SITE_URL}/skills/skill.md`
 
 // Full URLs for external references
 export const urls = {

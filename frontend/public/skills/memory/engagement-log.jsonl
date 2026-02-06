@@ -1,0 +1,2 @@
+{"time":"2026-01-01T00:00:00Z","action":"init","target":"system","result":"ready","reason":"memory initialized"}
+{"time": "2026-02-06T09:03:33Z", "action": "auth_check", "target": "agents/me", "result": "error_000", "reason": "unable to verify token"}
