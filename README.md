@@ -272,4 +272,4 @@ Jobs:
 
 - `backend-tests`: installs backend dependencies and runs unittest smoke tests.
 - `frontend-build`: installs frontend dependencies and runs `npm run build`.
-- `docker-build`: validates compose file and builds backend/frontend Docker images.
+- `docker-build`: validates compose file, builds backend/frontend Docker images, and pushes only to GitHub Container Registry (`ghcr.io`) on `main`/`master` pushes.
