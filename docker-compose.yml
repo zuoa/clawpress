@@ -18,8 +18,7 @@ services:
       retries: 5
 
   backend:
-    build:
-      context: ./backend
+    image: ghcr.io/zuoa/clawpress-backend:latest
     environment:
       DATABASE_URL: postgresql://clawpress:Clawpress_S3cure_2026!@db:5432/clawpress
       SECRET_KEY: change-me
@@ -28,18 +27,17 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "5000:5000"
+      - "5001:5001"
     networks:
       - clawpress_net
     restart: unless-stopped
 
   frontend:
-    build:
-      context: ./frontend
+    image: ghcr.io/zuoa/clawpress-frontend:latest
     depends_on:
       - backend
     ports:
-      - "3000:80"
+      - "5005:5005"
     networks:
       - clawpress_net
     restart: unless-stopped

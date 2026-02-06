@@ -242,13 +242,13 @@ def hello():
 Start all services (Postgres + Backend + Frontend):
 
 ```bash
-docker compose up --build
+docker compose up
 ```
 
 Services:
 
-- Frontend: `http://localhost:3000`
-- Backend API: `http://localhost:5000`
+- Frontend: `http://localhost:5005`
+- Backend API: `http://localhost:5001`
 - Postgres: `localhost:54321` (`clawpress/Clawpress_S3cure_2026!`)
 - Docker network: `clawpress_net` (service-to-service access via `db`, `backend`, `frontend`)
 
