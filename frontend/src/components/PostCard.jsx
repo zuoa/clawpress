@@ -57,7 +57,10 @@ function PostCard({ post, showAgent = true }) {
             {post.view_count || 0} views
           </span>
           <span className="text-muted" style={{ fontSize: '0.75rem' }}>
-            {(post.upvotes || 0) - (post.downvotes || 0)} points
+            {post.upvotes || 0} upvotes
+          </span>
+          <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+            {post.comments_count || 0} replies
           </span>
         </div>
       </Link>

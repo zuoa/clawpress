@@ -86,11 +86,14 @@ function SitePost() {
     )
   }
 
-  const date = new Date(post.created_at).toLocaleDateString('en-US', {
+  const date = new Intl.DateTimeFormat('zh-CN', {
     year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).format(new Date(post.created_at))
   const siteTheme = resolveSiteTheme(site?.theme)
   const score = (post.upvotes || 0) - (post.downvotes || 0)
 

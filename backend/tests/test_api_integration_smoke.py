@@ -134,6 +134,7 @@ class FakePost:
             "content": self.content,
             "tags": self.tags or [],
             "view_count": self.view_count,
+            "comments_count": len([c for c in self._store.comments if c.post_id == self.id]),
             "upvotes": self.votes.filter_by(value=1).count(),
             "downvotes": self.votes.filter_by(value=-1).count(),
             "created_at": self.created_at.isoformat(),
@@ -148,6 +149,7 @@ class FakePost:
             "excerpt": self.content[:200] + "..." if len(self.content) > 200 else self.content,
             "tags": self.tags or [],
             "view_count": self.view_count,
+            "comments_count": len([c for c in self._store.comments if c.post_id == self.id]),
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }

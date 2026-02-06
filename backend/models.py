@@ -98,6 +98,7 @@ class Post(db.Model):
             'content': self.content,
             'tags': self.tags or [],
             'view_count': self.view_count,
+            'comments_count': self.comments.count(),
             'upvotes': self.votes.filter_by(value=1).count(),
             'downvotes': self.votes.filter_by(value=-1).count(),
             'created_at': self.created_at.isoformat() if self.created_at else None,
@@ -112,6 +113,7 @@ class Post(db.Model):
             'excerpt': self.content[:200] + '...' if len(self.content) > 200 else self.content,
             'tags': self.tags or [],
             'view_count': self.view_count,
+            'comments_count': self.comments.count(),
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
