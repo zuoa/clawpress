@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
-import PostCard from '../components/PostCard'
 import { resolveSiteTheme } from '../theme'
 
 
@@ -65,52 +64,57 @@ function SiteHome() {
 
   return (
     <div className={`container site-shell site-theme-${siteTheme}`}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        {/* Site Header */}
-        <div className="text-center mb-xl" style={{ padding: 'var(--spacing-xl) 0' }}>
+      <div className="site-profile-layout">
+        <header className="site-profile-header">
           {site?.avatar_url && (
             <img
               src={site.avatar_url}
               alt={site.name}
-              style={{
-                width: 100,
-                height: 100,
-                borderRadius: '50%',
-                objectFit: 'cover',
-                marginBottom: 'var(--spacing-md)'
-              }}
+              className="site-profile-avatar"
             />
           )}
-          <h1 style={{ marginBottom: 'var(--spacing-sm)' }}>{site?.name}</h1>
+          <h1>{site?.name}</h1>
+          <p className="site-profile-handle">@{site?.username}</p>
           {site?.description && (
-            <p className="text-secondary" style={{ marginBottom: 'var(--spacing-sm)' }}>
+            <p className="site-profile-intro">
               {site.description}
             </p>
           )}
           {!site?.description && (
-            <p className="text-secondary" style={{ marginBottom: 'var(--spacing-sm)' }}>
+            <p className="site-profile-intro">
               Agent profile on the Clawpress publishing network.
             </p>
           )}
-          <p className="text-muted" style={{ fontSize: '0.875rem' }}>
+          <p className="site-profile-meta">
             {site?.posts_count || 0} posts published
           </p>
-        </div>
+        </header>
 
-        {/* Posts */}
+        <section className="site-profile-posts">
+          <h2>Posts</h2>
         {posts.length === 0 ? (
-          <div className="text-center text-muted" style={{ padding: 'var(--spacing-2xl)' }}>
+          <div className="site-posts-empty">
             No posts published yet.
           </div>
         ) : (
           <>
-            <div className="posts-feed">
+            <div className="site-posts-list">
               {posts.map((post, index) => (
                 <div key={post.id} className="fade-in" style={{
-                  animationDelay: `${index * 50}ms`,
-                  marginBottom: 'var(--spacing-lg)'
+                  animationDelay: `${index * 50}ms`
                 }}>
-                  <PostCard post={{ ...post, agent_username: username }} />
+                  <article className="site-post-row">
+                    <Link to={`/${username}/posts/${post.slug}`} className="site-post-row-title">
+                      {post.title}
+                    </Link>
+                    {post.excerpt && (
+                      <p className="site-post-row-excerpt">{post.excerpt}</p>
+                    )}
+                    <div className="site-post-row-meta">
+                      <span>{new Date(post.created_at).toLocaleDateString('en-US')}</span>
+                      <span>{post.view_count || 0} views</span>
+                    </div>
+                  </article>
                 </div>
               ))}
             </div>
@@ -118,7 +122,7 @@ function SiteHome() {
             {loading && <div className="loading">Loading...</div>}
 
             {!loading && hasMore && (
-              <div style={{ textAlign: 'center', marginTop: 'var(--spacing-lg)' }}>
+              <div className="site-posts-load-more">
                 <button onClick={loadMore} className="btn btn-secondary">
                   Load More
                 </button>
@@ -126,6 +130,7 @@ function SiteHome() {
             )}
           </>
         )}
+        </section>
       </div>
     </div>
   )

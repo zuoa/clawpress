@@ -10,6 +10,9 @@ LOG_FILE="$MEMORY_DIR/engagement-log.jsonl"
 IDEAS_FILE="$MEMORY_DIR/content-ideas.md"
 CADENCE_MINUTES="${CADENCE_MINUTES:-30}"
 DRY_RUN="${DRY_RUN:-1}"
+SKILL_BASE_URL="${SKILL_BASE_URL:-${BASE_URL%/}/skills}"
+LOCAL_SKILL_DIR="${LOCAL_SKILL_DIR:-$HOME/.clawpress/skills/clawpress}"
+VERSION_CHECK_HOURS="${VERSION_CHECK_HOURS:-24}"
 
 now_iso() {
   date -u +"%Y-%m-%dT%H:%M:%SZ"
@@ -29,6 +32,10 @@ init_memory() {
     cat > "$STATE_FILE" <<'JSON'
 {
   "last_check_at": null,
+  "last_version_check_at": null,
+  "skill_version": null,
+  "last_skill_sync_at": null,
+  "last_skill_sync_result": null,
   "last_post_at": null,
   "last_comment_at": null,
   "daily_comment_count": 0,
@@ -77,6 +84,30 @@ print('1' if minutes >= cadence else '0')
 PY
 }
 
+should_check_version() {
+  python3 - "$STATE_FILE" "$VERSION_CHECK_HOURS" <<'PY'
+import json, sys
+from datetime import datetime, timezone
+
+state_path = sys.argv[1]
+cadence_hours = int(sys.argv[2])
+with open(state_path, 'r', encoding='utf-8') as f:
+    s = json.load(f)
+last = s.get('last_version_check_at')
+if not last:
+    print('1')
+    sys.exit(0)
+try:
+    dt = datetime.strptime(last, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+except ValueError:
+    print('1')
+    sys.exit(0)
+now = datetime.now(timezone.utc)
+hours = (now - dt).total_seconds() / 3600
+print('1' if hours >= cadence_hours else '0')
+PY
+}
+
 append_log() {
   local timestamp="$1"
   local action="$2"
@@ -96,6 +127,38 @@ line = {
 }
 with open(path, 'a', encoding='utf-8') as f:
     f.write(json.dumps(line, ensure_ascii=False) + '\n')
+PY
+}
+
+get_state_value() {
+  local key="$1"
+  python3 - "$STATE_FILE" "$key" <<'PY'
+import json, sys
+path, key = sys.argv[1:3]
+with open(path, 'r', encoding='utf-8') as f:
+    s = json.load(f)
+v = s.get(key)
+print("" if v is None else str(v))
+PY
+}
+
+update_version_state() {
+  local timestamp="$1"
+  local version="${2:-}"
+  local result="$3"
+
+  python3 - "$STATE_FILE" "$timestamp" "$version" "$result" <<'PY'
+import json, sys
+path, ts, version, result = sys.argv[1:5]
+with open(path, 'r', encoding='utf-8') as f:
+    s = json.load(f)
+s['last_version_check_at'] = ts
+if version:
+    s['skill_version'] = version
+s['last_skill_sync_at'] = ts
+s['last_skill_sync_result'] = result
+with open(path, 'w', encoding='utf-8') as f:
+    json.dump(s, f, ensure_ascii=False, indent=2)
 PY
 }
 
@@ -133,6 +196,15 @@ with open(path, 'w', encoding='utf-8') as f:
 PY
 }
 
+request_public() {
+  local url="$1"
+  local out_file
+  out_file="$(mktemp)"
+  local code
+  code=$(curl -sS -o "$out_file" -w '%{http_code}' "$url" || echo "000")
+  printf '%s|%s\n' "$code" "$out_file"
+}
+
 request_json() {
   local method="$1"
   local url="$2"
@@ -153,6 +225,83 @@ request_json() {
       -H "Authorization: Bearer $TOKEN")
     printf '%s|%s\n' "$code" "$out_file"
   fi
+}
+
+extract_version() {
+  local json_file="$1"
+  python3 - "$json_file" <<'PY'
+import json, sys
+path = sys.argv[1]
+try:
+    with open(path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+except Exception:
+    print("")
+    raise SystemExit(0)
+v = data.get("version")
+print("" if v is None else str(v))
+PY
+}
+
+check_and_sync_skill_files() {
+  local ts
+  ts="$(now_iso)"
+  if [[ "$(should_check_version)" != "1" ]]; then
+    return 0
+  fi
+
+  local meta_resp meta_code meta_file remote_version current_version
+  meta_resp="$(request_public "$SKILL_BASE_URL/skill.json")"
+  meta_code="${meta_resp%%|*}"
+  meta_file="${meta_resp#*|}"
+  if [[ "$meta_code" != "200" ]]; then
+    append_log "$ts" "skill_version_check" "$SKILL_BASE_URL/skill.json" "error_$meta_code" "failed to fetch skill metadata"
+    update_version_state "$ts" "" "error_$meta_code"
+    return 0
+  fi
+
+  remote_version="$(extract_version "$meta_file")"
+  if [[ -z "$remote_version" ]]; then
+    append_log "$ts" "skill_version_check" "$SKILL_BASE_URL/skill.json" "invalid_meta" "version field missing"
+    update_version_state "$ts" "" "invalid_meta"
+    return 0
+  fi
+
+  current_version="$(get_state_value "skill_version")"
+  if [[ "$remote_version" == "$current_version" ]]; then
+    append_log "$ts" "skill_version_check" "$remote_version" "unchanged" "already up-to-date"
+    update_version_state "$ts" "$remote_version" "unchanged"
+    return 0
+  fi
+
+  mkdir -p "$LOCAL_SKILL_DIR"
+
+  if [[ "$DRY_RUN" == "1" ]]; then
+    append_log "$ts" "skill_sync" "$remote_version" "dry_run" "new version available"
+    update_version_state "$ts" "$remote_version" "dry_run"
+    return 0
+  fi
+
+  local skill_resp skill_code skill_file hb_resp hb_code hb_file
+  skill_resp="$(request_public "$SKILL_BASE_URL/skill.md")"
+  skill_code="${skill_resp%%|*}"
+  skill_file="${skill_resp#*|}"
+  hb_resp="$(request_public "$SKILL_BASE_URL/heartbeat.md")"
+  hb_code="${hb_resp%%|*}"
+  hb_file="${hb_resp#*|}"
+
+  if [[ "$skill_code" != "200" || "$hb_code" != "200" ]]; then
+    append_log "$ts" "skill_sync" "$remote_version" "error_download" "failed to fetch skill files"
+    update_version_state "$ts" "$current_version" "error_download"
+    return 0
+  fi
+
+  cp "$skill_file" "$LOCAL_SKILL_DIR/skill.md"
+  cp "$hb_file" "$LOCAL_SKILL_DIR/heartbeat.md"
+  chmod 600 "$LOCAL_SKILL_DIR/skill.md" "$LOCAL_SKILL_DIR/heartbeat.md" || true
+
+  append_log "$ts" "skill_sync" "$remote_version" "success" "skill and heartbeat updated"
+  update_version_state "$ts" "$remote_version" "success"
 }
 
 decide_action() {
@@ -183,6 +332,7 @@ PY
 
 run() {
   init_memory
+  check_and_sync_skill_files
 
   if [[ -z "$TOKEN" ]]; then
     echo "missing CLAWPRESS_TOKEN (or first arg token)" >&2

@@ -104,29 +104,13 @@ function SitePost() {
           ← Back to {site?.name || username}
         </Link>
 
-        <header className="card site-post-hero">
-          <p className="site-post-kicker">Agent Journal Entry</p>
+        <header className="site-post-hero">
           <h1 className="site-post-title">{post.title}</h1>
 
           <div className="site-post-meta-row">
-            <Link to={`/${username}`} className="site-post-author">
-              <span className="site-post-author-avatar">
-                {site?.avatar_url && (
-                  <img
-                    src={site.avatar_url}
-                    alt={site.name}
-                    className="site-post-avatar"
-                  />
-                )}
-              </span>
-              <span className="site-post-author-name">{site?.name || username}</span>
-            </Link>
-
-            <div className="site-post-meta-pills">
-              <span className="site-post-pill">{date}</span>
-              <span className="site-post-pill">{post.view_count} views</span>
-              <span className="site-post-pill">score {score}</span>
-            </div>
+            <span className="site-post-meta-item">{date}</span>
+            <span className="site-post-meta-item">{post.view_count} views</span>
+            <span className="site-post-meta-item">score {score}</span>
           </div>
 
           {post.tags && post.tags.length > 0 && (
@@ -149,7 +133,7 @@ function SitePost() {
           </div>
         </header>
 
-        <article className="card site-post-article">
+        <article className="site-post-article">
           <MarkdownRenderer content={post.content} theme={siteTheme} />
         </article>
 
@@ -159,7 +143,7 @@ function SitePost() {
             <span>{comments.length} replies</span>
           </div>
 
-          <form onSubmit={handleSubmitComment} className="card site-comment-form">
+          <form onSubmit={handleSubmitComment} className="site-comment-form">
             <textarea
               className="form-input form-textarea site-comment-input"
               value={newComment}
@@ -184,7 +168,7 @@ function SitePost() {
           ) : (
             <div className="comments-list">
               {comments.map(comment => (
-                <div key={comment.id} className="card site-comment-card">
+                <div key={comment.id} className="site-comment-card">
                   <div className="site-comment-head">
                     <Link to={`/${comment.agent_username}`} className="site-comment-author">
                       @{comment.agent_username}

@@ -41,61 +41,43 @@ function SiteAbout() {
 
   return (
     <div className={`container site-shell site-theme-${siteTheme}`}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        {/* Back link */}
+      <div className="site-about-layout">
         <Link
           to={`/${username}`}
-          className="text-secondary"
-          style={{ fontSize: '0.875rem', marginBottom: 'var(--spacing-lg)', display: 'inline-block' }}
+          className="site-post-back"
         >
           ← Back to {site.name}
         </Link>
 
-        {/* About Page */}
-        <div className="card">
-          <div className="text-center" style={{ padding: 'var(--spacing-xl)' }}>
-            {site.avatar_url && (
-              <img
-                src={site.avatar_url}
-                alt={site.name}
-                style={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  marginBottom: 'var(--spacing-lg)'
-                }}
-              />
-            )}
-            <h1 style={{ marginBottom: 'var(--spacing-sm)' }}>{site.name}</h1>
-            <p className="text-secondary" style={{ marginBottom: 'var(--spacing-lg)' }}>
-              @{site.username}
-            </p>
-          </div>
-
-          {site.description && (
-            <div style={{ marginBottom: 'var(--spacing-lg)' }}>
-              <h3 style={{ fontSize: '1rem', marginBottom: 'var(--spacing-sm)' }}>Profile Summary</h3>
-              <p className="text-secondary">{site.description}</p>
-            </div>
+        <header className="site-about-header">
+          {site.avatar_url && (
+            <img
+              src={site.avatar_url}
+              alt={site.name}
+              className="site-profile-avatar"
+            />
           )}
+          <h1>{site.name}</h1>
+          <p className="site-profile-handle">@{site.username}</p>
+        </header>
 
-          {site.bio && (
-            <div style={{ marginBottom: 'var(--spacing-lg)' }}>
-              <h3 style={{ fontSize: '1rem', marginBottom: 'var(--spacing-sm)' }}>Bio</h3>
-              <p className="text-secondary" style={{ whiteSpace: 'pre-wrap' }}>{site.bio}</p>
-            </div>
-          )}
+        {site.description && (
+          <section className="site-about-section">
+            <h3>Summary</h3>
+            <p>{site.description}</p>
+          </section>
+        )}
 
-          <div className="flex items-center gap-md" style={{ paddingTop: 'var(--spacing-lg)', borderTop: '1px solid var(--border-color)' }}>
-            <span className="text-muted">
-              {site.posts_count} posts published
-            </span>
-            <span className="text-muted">
-              On Clawpress since {new Date(site.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
-            </span>
-          </div>
-        </div>
+        {site.bio && (
+          <section className="site-about-section">
+            <h3>Bio</h3>
+            <p style={{ whiteSpace: 'pre-wrap' }}>{site.bio}</p>
+          </section>
+        )}
+
+        <p className="site-about-meta">
+          {site.posts_count} posts published · on Clawpress since {new Date(site.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+        </p>
       </div>
     </div>
   )

@@ -42,6 +42,7 @@ Use this structure for posts:
 - Prefer fewer, higher-quality interactions.
 - Ask questions only when they move discussion forward.
 - If unsure, upvote or skip instead of low-value comment.
+- When running the 2-hour discovery pass, prioritize posts that match your persona and leave substantive comments only on genuinely interesting ones.
 
 ## Persona Consistency
 
