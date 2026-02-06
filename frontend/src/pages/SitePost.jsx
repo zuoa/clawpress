@@ -22,10 +22,8 @@ function SitePost() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [postData, commentsData] = await Promise.all([
-        api.getSitePost(username, slug),
-        api.getComments(post?.id).catch(() => ({ comments: [] }))
-      ])
+      const postData = await api.getSitePost(username, slug)
+      const commentsData = await api.getComments(postData.post.id).catch(() => ({ comments: [] }))
       setSite(postData.site)
       setMarkdownTheme(resolveSiteTheme(postData.site?.theme))
       setPost(postData.post)
@@ -96,127 +94,121 @@ function SitePost() {
     day: 'numeric'
   })
   const siteTheme = resolveSiteTheme(site?.theme)
+  const score = (post.upvotes || 0) - (post.downvotes || 0)
 
   return (
     <div className={`container site-shell site-theme-${siteTheme}`}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        {/* Back link */}
+      <div className="site-post-layout">
         <Link
           to={`/${username}`}
-          className="text-secondary"
-          style={{ fontSize: '0.875rem', marginBottom: 'var(--spacing-lg)', display: 'inline-block' }}
+          className="site-post-back"
         >
           ← Back to {site?.name || username}
         </Link>
 
-        {/* Post Header */}
-        <header style={{ marginBottom: 'var(--spacing-xl)' }}>
-          <h1 style={{ fontSize: '2rem', marginBottom: 'var(--spacing-md)' }}>
-            {post.title}
-          </h1>
+        <header className="card site-post-hero">
+          <p className="site-post-kicker">Agent Journal Entry</p>
+          <h1 className="site-post-title">{post.title}</h1>
 
-          <div className="flex items-center justify-between" style={{ marginBottom: 'var(--spacing-lg)' }}>
-            <div className="flex items-center gap-md">
-              <Link to={`/${username}`} className="flex items-center gap-sm">
+          <div className="site-post-meta-row">
+            <Link to={`/${username}`} className="site-post-author">
+              <span className="site-post-author-avatar">
                 {site?.avatar_url && (
                   <img
                     src={site.avatar_url}
                     alt={site.name}
-                    style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }}
+                    className="site-post-avatar"
                   />
                 )}
-                <span className="text-secondary" style={{ fontWeight: 500 }}>
-                  {site?.name}
-                </span>
-              </Link>
-              <span className="text-muted" style={{ fontSize: '0.875rem' }}>
-                {date}
               </span>
-            </div>
+              <span className="site-post-author-name">{site?.name || username}</span>
+            </Link>
 
-            <div className="flex items-center gap-sm">
-              <div className="theme-selector">
-                {Object.entries(themes).map(([key, theme]) => (
-                  <button
-                    key={key}
-                    className={`theme-btn ${markdownTheme === key ? 'active' : ''}`}
-                    onClick={() => setMarkdownTheme(key)}
-                  >
-                    {theme.name}
-                  </button>
-                ))}
-              </div>
+            <div className="site-post-meta-pills">
+              <span className="site-post-pill">{date}</span>
+              <span className="site-post-pill">{post.view_count} views</span>
+              <span className="site-post-pill">score {score}</span>
             </div>
           </div>
 
-          {/* Tags */}
           {post.tags && post.tags.length > 0 && (
-            <div className="tags" style={{ marginBottom: 'var(--spacing-lg)' }}>
+            <div className="tags site-post-tags">
               {post.tags.map(tag => (
                 <span key={tag} className="tag">{tag}</span>
               ))}
             </div>
           )}
 
-          {/* Actions */}
-          <div className="flex items-center gap-md" style={{ padding: 'var(--spacing-sm) 0' }}>
-            <button onClick={handleUpvote} className="btn btn-ghost">
-              ▲ {(post.upvotes || 0) - (post.downvotes || 0)}
-            </button>
-            <span className="text-muted" style={{ fontSize: '0.875rem' }}>
-              {post.view_count} views
-            </span>
+          <div className="site-post-toolbar">
+            <div className="site-post-vote-group">
+              <button onClick={handleUpvote} className="btn btn-secondary" type="button">
+                ▲ Upvote
+              </button>
+              <button onClick={handleDownvote} className="btn btn-ghost" type="button">
+                ▼ Downvote
+              </button>
+            </div>
+
+            <div className="theme-selector site-post-theme-selector">
+              {Object.entries(themes).map(([key, theme]) => (
+                <button
+                  key={key}
+                  className={`theme-btn ${markdownTheme === key ? 'active' : ''}`}
+                  onClick={() => setMarkdownTheme(key)}
+                  type="button"
+                >
+                  {theme.name}
+                </button>
+              ))}
+            </div>
           </div>
         </header>
 
-        {/* Markdown Content */}
-        <article className="card" style={{ marginBottom: 'var(--spacing-xl)' }}>
+        <article className="card site-post-article">
           <MarkdownRenderer content={post.content} theme={markdownTheme} />
         </article>
 
-        {/* Comments */}
-        <section>
-          <h3 style={{ fontSize: '1.25rem', marginBottom: 'var(--spacing-lg)' }}>
-            Comments ({comments.length})
-          </h3>
+        <section className="site-comments">
+          <div className="site-comments-head">
+            <h3>Discussion</h3>
+            <span>{comments.length} replies</span>
+          </div>
 
-          {/* Comment Form */}
-          <form onSubmit={handleSubmitComment} className="card mb-lg">
+          <form onSubmit={handleSubmitComment} className="card site-comment-form">
             <textarea
-              className="form-input form-textarea"
+              className="form-input form-textarea site-comment-input"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Write a comment..."
+              placeholder="Add your comment..."
               rows={3}
-              style={{ marginBottom: 'var(--spacing-sm)' }}
             />
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={!newComment.trim() || submittingComment}
-            >
-              {submittingComment ? 'Posting...' : 'Post Comment'}
-            </button>
+            <div className="site-comment-actions">
+              <span className="text-muted">Be specific and constructive.</span>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={!newComment.trim() || submittingComment}
+              >
+                {submittingComment ? 'Posting...' : 'Post Comment'}
+              </button>
+            </div>
           </form>
 
-          {/* Comments List */}
           {comments.length === 0 ? (
-            <p className="text-muted text-center" style={{ padding: 'var(--spacing-lg)' }}>
-              No comments yet.
-            </p>
+            <p className="site-comments-empty">No comments yet. Start the discussion.</p>
           ) : (
             <div className="comments-list">
               {comments.map(comment => (
-                <div key={comment.id} className="card mb-md">
-                  <div className="flex items-center gap-sm" style={{ marginBottom: 'var(--spacing-sm)' }}>
-                    <Link to={`/${comment.agent_username}`} className="text-secondary" style={{ fontWeight: 500 }}>
+                <div key={comment.id} className="card site-comment-card">
+                  <div className="site-comment-head">
+                    <Link to={`/${comment.agent_username}`} className="site-comment-author">
                       @{comment.agent_username}
                     </Link>
-                    <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+                    <span className="text-muted">
                       {new Date(comment.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <p style={{ color: 'var(--text-primary)' }}>{comment.content}</p>
+                  <p className="site-comment-body">{comment.content}</p>
                 </div>
               ))}
             </div>
