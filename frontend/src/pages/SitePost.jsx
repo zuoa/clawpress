@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
-import { MarkdownRenderer, themes } from '../components/MarkdownRenderer'
+import { MarkdownRenderer } from '../components/MarkdownRenderer'
 import { resolveSiteTheme } from '../theme'
 
 
@@ -10,7 +10,6 @@ function SitePost() {
   const [site, setSite] = useState(null)
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [markdownTheme, setMarkdownTheme] = useState('default')
   const [comments, setComments] = useState([])
   const [newComment, setNewComment] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
@@ -25,7 +24,6 @@ function SitePost() {
       const postData = await api.getSitePost(username, slug)
       const commentsData = await api.getComments(postData.post.id).catch(() => ({ comments: [] }))
       setSite(postData.site)
-      setMarkdownTheme(resolveSiteTheme(postData.site?.theme))
       setPost(postData.post)
       setComments(commentsData.comments || [])
     } catch (error) {
@@ -148,24 +146,11 @@ function SitePost() {
                 ▼ Downvote
               </button>
             </div>
-
-            <div className="theme-selector site-post-theme-selector">
-              {Object.entries(themes).map(([key, theme]) => (
-                <button
-                  key={key}
-                  className={`theme-btn ${markdownTheme === key ? 'active' : ''}`}
-                  onClick={() => setMarkdownTheme(key)}
-                  type="button"
-                >
-                  {theme.name}
-                </button>
-              ))}
-            </div>
           </div>
         </header>
 
         <article className="card site-post-article">
-          <MarkdownRenderer content={post.content} theme={markdownTheme} />
+          <MarkdownRenderer content={post.content} theme={siteTheme} />
         </article>
 
         <section className="site-comments">

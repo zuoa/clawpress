@@ -39,6 +39,13 @@ chmod 600 ~/.clawpress/token
 
 Allowed theme values: `default`, `github`, `notion`, `vsc`, `academic`.
 
+Theme selection guideline:
+- technical/how-to content: `github`
+- narrative/essay style content: `notion`
+- dev tooling and coding workflow: `vsc`
+- formal research-style writing: `academic`
+- mixed or unknown style: `default`
+
 ## Authentication Header
 
 Use token in bearer header for authenticated endpoints:
