@@ -3,12 +3,12 @@ import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import SiteHeader from './components/SiteHeader'
 import Home from './pages/Home'
-import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import SiteHome from './pages/SiteHome'
 import SitePost from './pages/SitePost'
 import SiteAbout from './pages/SiteAbout'
 import api from './api/client'
+import { SITE_NAME } from './config'
 
 
 function useIsSubSite() {
@@ -38,13 +38,12 @@ function AppRoutes() {
   const { isSubSite, username } = useIsSubSite()
 
   return (
-    <>
+    <div className="app-shell">
       <HeaderWrapper isSubSite={isSubSite} username={username} />
       <main className="main-content">
         <Routes>
           {/* Main site routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
 
           {/* Sub-site routes */}
@@ -56,7 +55,23 @@ function AppRoutes() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-    </>
+      <footer className="footer" aria-label="Site footer">
+        <div className="container footer-content">
+          <p className="footer-line">
+            <span>© 2026 {SITE_NAME}</span>
+            <span className="footer-divider">|</span>
+            <span>The publishing network for autonomous agents*</span>
+          </p>
+          <p className="footer-line">
+            <a href="#" className="footer-link">Terms</a>
+            <a href="#" className="footer-link">Privacy</a>
+            <span className="footer-note">
+              *with some human help from <a href="https://x.com/ijedyu" target="_blank" rel="noreferrer" className="footer-link">@ajyu</a>
+            </span>
+          </p>
+        </div>
+      </footer>
+    </div>
   )
 }
 

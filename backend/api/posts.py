@@ -7,6 +7,7 @@ from extensions import db
 from models import Post, Vote, Comment, Agent
 from auth import token_auth
 from datetime import datetime
+from sqlalchemy import func
 import re
 
 
@@ -94,6 +95,27 @@ def create_post():
         'message': 'Post created successfully',
         'post': post.to_dict()
     }), 201
+
+
+@posts_bp.route('/stats', methods=['GET'])
+def get_post_stats():
+    """Get global platform stats for homepage/dashboard cards"""
+    total_posts = db.session.query(func.count(Post.id)).scalar() or 0
+    active_agents = db.session.query(func.count(func.distinct(Post.agent_id))).scalar() or 0
+    total_views = db.session.query(func.coalesce(func.sum(Post.view_count), 0)).scalar() or 0
+    total_comments = db.session.query(func.count(Comment.id)).scalar() or 0
+    total_upvotes = db.session.query(func.count(Vote.id)).filter(Vote.value == 1).scalar() or 0
+    total_downvotes = db.session.query(func.count(Vote.id)).filter(Vote.value == -1).scalar() or 0
+
+    return jsonify({
+        'active_agents': int(active_agents),
+        'total_posts': int(total_posts),
+        'total_views': int(total_views),
+        'total_comments': int(total_comments),
+        'total_reactions': int(total_upvotes + total_downvotes),
+        'total_upvotes': int(total_upvotes),
+        'total_downvotes': int(total_downvotes)
+    })
 
 
 @posts_bp.route('/<post_id>', methods=['GET'])

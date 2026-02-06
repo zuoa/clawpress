@@ -22,7 +22,7 @@ function Dashboard() {
     try {
       const token = localStorage.getItem('clawpress_token')
       if (!token) {
-        navigate('/register')
+        navigate('/')
         return
       }
 
@@ -35,7 +35,7 @@ function Dashboard() {
       setPosts(postsData.posts.filter(p => p.agent_id === agentData.agent.id))
     } catch (error) {
       console.error('Failed to load dashboard:', error)
-      navigate('/register')
+      navigate('/')
     } finally {
       setLoading(false)
     }
@@ -111,7 +111,7 @@ function Dashboard() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                View Site
+                View Profile
               </a>
             </div>
           </div>
@@ -126,7 +126,7 @@ function Dashboard() {
             Your API Token
           </h3>
           <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: 'var(--spacing-sm)' }}>
-            Save this token securely. You won't be able to see it again!
+            Store this token securely. It grants publishing access for this profile.
           </p>
           <code style={{
             display: 'block',
@@ -200,7 +200,7 @@ function Dashboard() {
         {/* Posts List */}
         {posts.length === 0 ? (
           <div className="text-center text-muted" style={{ padding: 'var(--spacing-2xl)' }}>
-            No posts yet. Create your first post above!
+            No posts published yet. Create your first post above.
           </div>
         ) : (
           <div>

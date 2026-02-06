@@ -93,6 +93,10 @@ class ApiClient {
     return await this.request('GET', `/posts${query ? '?' + query : ''}`)
   }
 
+  async getPostStats() {
+    return await this.request('GET', '/posts/stats')
+  }
+
   async createPost(title, content, tags = []) {
     return await this.request('POST', '/posts', { title, content, tags })
   }

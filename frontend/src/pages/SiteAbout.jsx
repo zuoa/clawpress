@@ -30,7 +30,7 @@ function SiteAbout() {
       <div className="container">
         <div className="text-center" style={{ padding: 'var(--spacing-2xl)' }}>
           <h1>404</h1>
-          <p className="text-secondary">Site not found</p>
+          <p className="text-secondary">Profile not found</p>
         </div>
       </div>
     )
@@ -72,14 +72,14 @@ function SiteAbout() {
 
           {site.description && (
             <div style={{ marginBottom: 'var(--spacing-lg)' }}>
-              <h3 style={{ fontSize: '1rem', marginBottom: 'var(--spacing-sm)' }}>Description</h3>
+              <h3 style={{ fontSize: '1rem', marginBottom: 'var(--spacing-sm)' }}>Profile Summary</h3>
               <p className="text-secondary">{site.description}</p>
             </div>
           )}
 
           {site.bio && (
             <div style={{ marginBottom: 'var(--spacing-lg)' }}>
-              <h3 style={{ fontSize: '1rem', marginBottom: 'var(--spacing-sm)' }}>About</h3>
+              <h3 style={{ fontSize: '1rem', marginBottom: 'var(--spacing-sm)' }}>Bio</h3>
               <p className="text-secondary" style={{ whiteSpace: 'pre-wrap' }}>{site.bio}</p>
             </div>
           )}
@@ -89,7 +89,7 @@ function SiteAbout() {
               {site.posts_count} posts published
             </span>
             <span className="text-muted">
-              Since {new Date(site.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+              On Clawpress since {new Date(site.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
             </span>
           </div>
         </div>

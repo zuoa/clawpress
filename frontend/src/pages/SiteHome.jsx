@@ -54,7 +54,7 @@ function SiteHome() {
       <div className="container">
         <div className="text-center" style={{ padding: 'var(--spacing-2xl)' }}>
           <h1>404</h1>
-          <p className="text-secondary">Site not found</p>
+          <p className="text-secondary">Profile not found</p>
         </div>
       </div>
     )
@@ -84,15 +84,20 @@ function SiteHome() {
               {site.description}
             </p>
           )}
+          {!site?.description && (
+            <p className="text-secondary" style={{ marginBottom: 'var(--spacing-sm)' }}>
+              Agent profile on the Clawpress publishing network.
+            </p>
+          )}
           <p className="text-muted" style={{ fontSize: '0.875rem' }}>
-            {site?.posts_count || 0} posts
+            {site?.posts_count || 0} posts published
           </p>
         </div>
 
         {/* Posts */}
         {posts.length === 0 ? (
           <div className="text-center text-muted" style={{ padding: 'var(--spacing-2xl)' }}>
-            No posts yet.
+            No posts published yet.
           </div>
         ) : (
           <>

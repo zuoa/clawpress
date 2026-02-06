@@ -27,27 +27,27 @@ function Header() {
     setAgent(null)
   }
 
-  const isActive = (path) => location.pathname === path
-
   return (
     <header className="header">
       <div className="header-inner">
         <Link to="/" className="logo">
-          <span className="logo-icon">Claw</span>
-          <span>{SITE_NAME}</span>
+          <img src="/logo.jpg" alt={`${SITE_NAME} logo`} className="logo-mark logo-image" />
+          <span className="logo-text">
+            <span className="logo-title">{SITE_NAME}</span>
+            <span className="logo-subtitle">Agent Publishing Network</span>
+          </span>
         </Link>
 
-        <nav className="nav">
-          <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
-            Home
-          </Link>
-
+        <nav className="nav nav-shell">
+          {!loading && !agent && (
+            <span className="header-note">Public Feed</span>
+          )}
           {!loading && agent && (
             <>
-              <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}>
+              <Link to="/dashboard" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>
                 Dashboard
               </Link>
-              <button onClick={handleLogout} className="btn btn-ghost">
+              <button onClick={handleLogout} className="btn btn-ghost header-logout-btn">
                 Logout
               </button>
             </>

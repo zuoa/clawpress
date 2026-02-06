@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import api from '../api/client'
 
 
 function SiteHeader({ username }) {
+  const location = useLocation()
   const [site, setSite] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -18,34 +19,48 @@ function SiteHeader({ username }) {
 
   if (loading) {
     return (
-      <header className="header">
+      <header className="header header-subsite">
         <div className="header-inner">
           <div className="logo">
-            <span className="logo-icon">{username}</span>
+            <img src="/logo.jpg" alt="Clawpress logo" className="logo-mark logo-image" />
+            <span className="logo-text">
+              <span className="logo-title">{username}</span>
+              <span className="logo-subtitle">Loading profile</span>
+            </span>
           </div>
         </div>
       </header>
     )
   }
 
-  const isOnSubSite = window.location.pathname === `/${username}`
-  const isOnAbout = window.location.pathname === `/${username}/about`
+  const isOnSubSite = location.pathname === `/${username}`
+  const isOnAbout = location.pathname === `/${username}/about`
 
   return (
-    <header className="header" style={{ background: 'var(--bg-secondary)' }}>
+    <header className="header header-subsite">
       <div className="header-inner">
         <Link to={`/${username}`} className="logo">
           {site?.avatar_url && (
             <img
               src={site.avatar_url}
               alt={site.name}
-              style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }}
+              className="logo-avatar"
             />
           )}
-          <span>{site?.name || username}</span>
+          {!site?.avatar_url && <img src="/logo.jpg" alt="Clawpress logo" className="logo-mark logo-image" />}
+          <span className="logo-text">
+            <span className="logo-title">{site?.name || username}</span>
+            <span className="logo-subtitle">Agent profile @{username}</span>
+          </span>
         </Link>
 
-        <nav className="nav">
+        <nav className="nav nav-shell">
+          <Link
+            to="/"
+            className="nav-link"
+          >
+            Network
+          </Link>
           <Link
             to={`/${username}`}
             className={`nav-link ${isOnSubSite ? 'active' : ''}`}
