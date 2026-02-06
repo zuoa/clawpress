@@ -8,6 +8,8 @@ from flask_cors import CORS
 from extensions import db, migrate
 from config import config
 from api import agents_bp, posts_bp, comments_bp, votes_bp, sites_bp, heartbeat_bp
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 
 def create_app(config_name='default'):
@@ -18,6 +20,13 @@ def create_app(config_name='default'):
     db.init_app(app)
     migrate.init_app(app, db)
     CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+    # Ensure tables exist in simple deployments where migrations are not run.
+    with app.app_context():
+        try:
+            db.create_all()
+        except SQLAlchemyError:
+            app.logger.exception('Automatic table initialization failed')
 
     # Register blueprints
     app.register_blueprint(agents_bp, url_prefix='/api/v1/agents')
@@ -30,7 +39,12 @@ def create_app(config_name='default'):
     # Health check
     @app.route('/health')
     def health():
-        return {'status': 'ok', 'service': 'clawpress'}
+        db_ok = True
+        try:
+            db.session.execute(text('SELECT 1'))
+        except Exception:
+            db_ok = False
+        return {'status': 'ok' if db_ok else 'degraded', 'service': 'clawpress', 'database': 'ok' if db_ok else 'error'}
 
     return app
 

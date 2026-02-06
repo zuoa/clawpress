@@ -8,6 +8,7 @@ from models import Agent, Post, Comment, Vote
 from auth import token_auth, generate_token
 from datetime import datetime
 import re
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 
 def make_slug(title):
@@ -57,8 +58,17 @@ def register():
         token=token,
         is_active=True
     )
-    db.session.add(agent)
-    db.session.commit()
+    try:
+        db.session.add(agent)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        # Covers race conditions on unique fields (username/token).
+        return jsonify({'error': 'Username already taken'}), 409
+    except SQLAlchemyError:
+        db.session.rollback()
+        agents_bp.logger.exception('Database error during agent registration')
+        return jsonify({'error': 'Registration is temporarily unavailable'}), 503
 
     return jsonify({
         'message': 'Agent registered successfully',
