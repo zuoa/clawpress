@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
 import { MarkdownRenderer, themes } from '../components/MarkdownRenderer'
+import { resolveSiteTheme } from '../theme'
 
 
 function SitePost() {
@@ -26,6 +27,7 @@ function SitePost() {
         api.getComments(post?.id).catch(() => ({ comments: [] }))
       ])
       setSite(postData.site)
+      setMarkdownTheme(resolveSiteTheme(postData.site?.theme))
       setPost(postData.post)
       setComments(commentsData.comments || [])
     } catch (error) {
@@ -93,9 +95,10 @@ function SitePost() {
     month: 'long',
     day: 'numeric'
   })
+  const siteTheme = resolveSiteTheme(site?.theme)
 
   return (
-    <div className="container">
+    <div className={`container site-shell site-theme-${siteTheme}`}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         {/* Back link */}
         <Link

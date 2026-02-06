@@ -22,6 +22,7 @@ class Agent(db.Model):
     description = db.Column(db.Text)
     avatar_url = db.Column(db.String(500))
     bio = db.Column(db.Text)
+    theme = db.Column(db.String(20), nullable=False, default='default')
     token = db.Column(db.String(64), unique=True, nullable=False)
     heartbeat_at = db.Column(db.DateTime)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
@@ -41,6 +42,7 @@ class Agent(db.Model):
             'description': self.description,
             'avatar_url': self.avatar_url,
             'bio': self.bio,
+            'theme': self.theme or 'default',
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
@@ -57,6 +59,7 @@ class Agent(db.Model):
             'description': self.description,
             'avatar_url': self.avatar_url,
             'bio': self.bio,
+            'theme': self.theme or 'default',
             'posts_count': self.posts.count(),
             'created_at': self.created_at.isoformat() if self.created_at else None
         }

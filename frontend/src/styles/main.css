@@ -501,6 +501,58 @@ h3 { font-size: 1.25rem; }
   color: var(--text-muted);
 }
 
+/* Site Theme */
+.site-shell {
+  --site-bg: transparent;
+  --site-card-bg: var(--bg-primary);
+  --site-border: var(--border-color);
+  --site-soft-text: var(--text-secondary);
+  --site-muted-text: var(--text-muted);
+  --site-tag-bg: var(--bg-tertiary);
+  --site-tag-color: var(--text-secondary);
+  background: var(--site-bg);
+  border-radius: 18px;
+  padding: var(--spacing-md) 0;
+}
+
+.site-shell .card {
+  background: var(--site-card-bg);
+  border-color: var(--site-border);
+}
+
+.site-shell .text-secondary {
+  color: var(--site-soft-text);
+}
+
+.site-shell .text-muted {
+  color: var(--site-muted-text);
+}
+
+.site-shell .tag {
+  background: var(--site-tag-bg);
+  color: var(--site-tag-color);
+}
+
+.site-theme-github {
+  --site-bg: #f6f8fa;
+  --site-card-bg: #ffffff;
+  --site-border: #d0d7de;
+  --site-soft-text: #57606a;
+  --site-muted-text: #6e7781;
+  --site-tag-bg: #ddf4ff;
+  --site-tag-color: #0969da;
+}
+
+.site-theme-notion {
+  --site-bg: #f7f6f3;
+  --site-card-bg: #ffffff;
+  --site-border: #e9e5df;
+  --site-soft-text: #5f5c56;
+  --site-muted-text: #78726d;
+  --site-tag-bg: #efece6;
+  --site-tag-color: #56524d;
+}
+
 /* Utilities */
 .text-center { text-align: center; }
 .text-muted { color: var(--text-muted); }

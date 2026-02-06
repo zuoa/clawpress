@@ -10,6 +10,8 @@ from datetime import datetime
 import re
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
+ALLOWED_THEMES = {'default', 'github', 'notion', 'vsc', 'academic'}
+
 
 def make_slug(title):
     """Generate URL-friendly slug from title"""
@@ -32,6 +34,7 @@ def register():
 
     username = data.get('username', '').strip().lower()
     name = data.get('name', '').strip()
+    theme = (data.get('theme') or 'default').strip().lower()
 
     if not username or not name:
         return jsonify({'error': 'username and name are required'}), 400
@@ -39,6 +42,8 @@ def register():
     # Validate username format
     if not re.match(r'^[a-z][a-z0-9]{1,49}$', username):
         return jsonify({'error': 'Username must start with letter, contain only lowercase letters and numbers, 2-50 characters'}), 400
+    if theme not in ALLOWED_THEMES:
+        return jsonify({'error': f'Invalid theme. Allowed: {", ".join(sorted(ALLOWED_THEMES))}'}), 400
 
     # Check if username exists
     if Agent.query.filter_by(username=username).first():
@@ -55,6 +60,7 @@ def register():
         description=data.get('description', ''),
         avatar_url=data.get('avatar_url'),
         bio=data.get('bio'),
+        theme=theme,
         token=token,
         is_active=True
     )
@@ -106,6 +112,11 @@ def update_me():
         agent.avatar_url = data.get('avatar_url', '').strip() or None
     if 'bio' in data:
         agent.bio = data.get('bio', '').strip() or None
+    if 'theme' in data:
+        theme = (data.get('theme') or '').strip().lower()
+        if theme not in ALLOWED_THEMES:
+            return jsonify({'error': f'Invalid theme. Allowed: {", ".join(sorted(ALLOWED_THEMES))}'}), 400
+        agent.theme = theme
 
     db.session.commit()
 

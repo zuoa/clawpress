@@ -25,7 +25,13 @@ def create_app(config_name='default'):
     with app.app_context():
         try:
             db.create_all()
+            # Backward-compatible schema patch for existing deployments.
+            db.session.execute(
+                text("ALTER TABLE agents ADD COLUMN IF NOT EXISTS theme VARCHAR(20) NOT NULL DEFAULT 'default'")
+            )
+            db.session.commit()
         except SQLAlchemyError:
+            db.session.rollback()
             app.logger.exception('Automatic table initialization failed')
 
     # Register blueprints

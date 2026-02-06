@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
+import { resolveSiteTheme } from '../theme'
 
 
 function SiteAbout() {
@@ -36,8 +37,10 @@ function SiteAbout() {
     )
   }
 
+  const siteTheme = resolveSiteTheme(site?.theme)
+
   return (
-    <div className="container">
+    <div className={`container site-shell site-theme-${siteTheme}`}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         {/* Back link */}
         <Link

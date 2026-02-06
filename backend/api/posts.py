@@ -9,14 +9,43 @@ from auth import token_auth
 from datetime import datetime
 from sqlalchemy import func
 import re
+import secrets
+import unicodedata
+
+
+def _transliterate_char(char):
+    if char.isascii():
+        return char
+
+    decomposed = unicodedata.normalize('NFKD', char).encode('ascii', 'ignore').decode('ascii')
+    if decomposed:
+        return decomposed
+
+    # Keep non-Latin scripts in a deterministic, URL-safe form.
+    name = unicodedata.name(char, '')
+    match = re.search(r'IDEOGRAPH-([0-9A-F]{4,6})', name)
+    if match:
+        return f'u{match.group(1).lower()}'
+
+    return ' '
 
 
 def make_slug(title):
     """Generate URL-friendly slug from title"""
-    slug = re.sub(r'[^a-zA-Z0-9\s]', '', title.lower())
+    transliterated = ''.join(_transliterate_char(char) for char in (title or '')).lower()
+    slug = re.sub(r'[^a-z0-9\s-]', ' ', transliterated)
     slug = re.sub(r'\s+', '-', slug)
-    slug = slug[:200]
+    slug = re.sub(r'-{2,}', '-', slug).strip('-')
+    slug = slug[:200].rstrip('-')
     return slug
+
+
+def generate_base_slug(title):
+    slug = make_slug(title)
+    if slug:
+        return slug
+    # Fallback when title contains no slug-friendly characters.
+    return f'post-{secrets.token_hex(4)}'
 
 
 posts_bp = Blueprint('posts', __name__)
@@ -70,12 +99,17 @@ def create_post():
         return jsonify({'error': 'title and content are required'}), 400
 
     # Generate slug
-    slug = make_slug(title)
+    slug = generate_base_slug(title)
+    if not slug:
+        return jsonify({'error': 'Failed to generate slug from title'}), 400
     base_slug = slug
     counter = 1
     while Post.query.filter_by(agent_id=agent.id, slug=slug).first():
         slug = f'{base_slug}-{counter}'
+        slug = slug[:200].rstrip('-')
         counter += 1
+    if not slug:
+        return jsonify({'error': 'Failed to generate slug from title'}), 400
 
     tags = data.get('tags', [])
     if isinstance(tags, str):
@@ -156,7 +190,9 @@ def update_post(post_id):
 
         # Update slug if title changed
         if title != post.title:
-            new_slug = make_slug(title)
+            new_slug = generate_base_slug(title)
+            if not new_slug:
+                return jsonify({'error': 'Failed to generate slug from title'}), 400
             base_slug = new_slug
             counter = 1
             while Post.query.filter(
@@ -165,7 +201,10 @@ def update_post(post_id):
                 Post.id != post.id
             ).first():
                 new_slug = f'{base_slug}-{counter}'
+                new_slug = new_slug[:200].rstrip('-')
                 counter += 1
+            if not new_slug:
+                return jsonify({'error': 'Failed to generate slug from title'}), 400
             post.slug = new_slug
         post.title = title
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
 import PostCard from '../components/PostCard'
+import { resolveSiteTheme } from '../theme'
 
 
 function SiteHome() {
@@ -60,8 +61,10 @@ function SiteHome() {
     )
   }
 
+  const siteTheme = resolveSiteTheme(site?.theme)
+
   return (
-    <div className="container">
+    <div className={`container site-shell site-theme-${siteTheme}`}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         {/* Site Header */}
         <div className="text-center mb-xl" style={{ padding: 'var(--spacing-xl) 0' }}>

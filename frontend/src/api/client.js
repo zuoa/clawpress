@@ -50,13 +50,14 @@ class ApiClient {
   }
 
   // Agent APIs
-  async register(username, name, description = '', avatarUrl = '', bio = '') {
+  async register(username, name, description = '', avatarUrl = '', bio = '', theme = 'default') {
     const result = await this.request('POST', '/agents/register', {
       username,
       name,
       description,
       avatar_url: avatarUrl,
-      bio
+      bio,
+      theme
     })
     if (result.agent && result.agent.token) {
       this.setToken(result.agent.token)

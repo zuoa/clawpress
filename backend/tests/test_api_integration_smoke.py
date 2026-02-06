@@ -53,13 +53,14 @@ class _Store:
 
 
 class FakeAgent:
-    def __init__(self, id=None, username="", name="", description="", avatar_url=None, bio=None, token="", is_active=True):
+    def __init__(self, id=None, username="", name="", description="", avatar_url=None, bio=None, theme="default", token="", is_active=True):
         self.id = id or str(uuid.uuid4())
         self.username = username
         self.name = name
         self.description = description
         self.avatar_url = avatar_url
         self.bio = bio
+        self.theme = theme
         self.token = token
         self.is_active = is_active
         self.heartbeat_at = None
@@ -74,6 +75,7 @@ class FakeAgent:
             "description": self.description,
             "avatar_url": self.avatar_url,
             "bio": self.bio,
+            "theme": self.theme,
             "is_active": self.is_active,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
@@ -90,6 +92,7 @@ class FakeAgent:
             "description": self.description,
             "avatar_url": self.avatar_url,
             "bio": self.bio,
+            "theme": self.theme,
             "posts_count": len([p for p in self._store.posts if p.agent_id == self.id]),
             "created_at": self.created_at.isoformat(),
         }
@@ -378,6 +381,34 @@ class ApiIntegrationSmokeTests(unittest.TestCase):
         site_post_resp = self.client.get(f"/api/v1/sites/agent1/posts/{slug}")
         self.assertEqual(site_post_resp.status_code, 200)
         self.assertEqual(site_post_resp.get_json()["post"]["id"], post_id)
+
+    def test_slug_generation_for_non_ascii_and_symbols_only_titles(self):
+        register_resp = self.client.post(
+            "/api/v1/agents/register",
+            json={"username": "slugagent", "name": "Slug Agent"},
+        )
+        self.assertEqual(register_resp.status_code, 201)
+        token = register_resp.get_json()["agent"]["token"]
+
+        cjk_title_resp = self.client.post(
+            "/api/v1/posts",
+            headers={"Authorization": f"Bearer {token}"},
+            json={"title": "你好世界 测试", "content": "body"},
+        )
+        self.assertEqual(cjk_title_resp.status_code, 201)
+        cjk_slug = cjk_title_resp.get_json()["post"]["slug"]
+        self.assertTrue(cjk_slug)
+        self.assertRegex(cjk_slug, r"^[a-z0-9-]+$")
+
+        symbol_only_title_resp = self.client.post(
+            "/api/v1/posts",
+            headers={"Authorization": f"Bearer {token}"},
+            json={"title": "🚀!!!@@@", "content": "body"},
+        )
+        self.assertEqual(symbol_only_title_resp.status_code, 201)
+        symbol_slug = symbol_only_title_resp.get_json()["post"]["slug"]
+        self.assertTrue(symbol_slug)
+        self.assertRegex(symbol_slug, r"^post-[a-f0-9]{8}$")
 
 
 if __name__ == "__main__":
