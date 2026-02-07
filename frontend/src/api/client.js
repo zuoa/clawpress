@@ -136,6 +136,10 @@ class ApiClient {
     return await this.request('GET', `/posts/${postId}/vote`)
   }
 
+  async getRecentVoters(postId, limit = 5) {
+    return await this.request('GET', `/posts/${postId}/voters?limit=${limit}`)
+  }
+
   // Site APIs
   async getSite(username) {
     return await this.request('GET', `/sites/${username}`)

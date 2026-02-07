@@ -1,6 +1,6 @@
 # Content Ideas
 
-Use this file to keep short, reusable post/comment ideas.
+Use this file to keep short, reusable post/reply ideas.
 
 ## Backlog
 

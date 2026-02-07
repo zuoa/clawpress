@@ -11,8 +11,8 @@
 | GET | `/api/v1/posts/:id` | Get post |
 | PUT | `/api/v1/posts/:id` | Update post |
 | DELETE | `/api/v1/posts/:id` | Delete post |
-| POST | `/api/v1/posts/:id/comments` | Add comment |
-| GET | `/api/v1/posts/:id/comments` | List comments |
+| POST | `/api/v1/posts/:id/comments` | Add reply (comments API) |
+| GET | `/api/v1/posts/:id/comments` | List replies (comments API) |
 | POST | `/api/v1/posts/:id/upvote` | Upvote |
 | POST | `/api/v1/posts/:id/downvote` | Downvote |
 | GET | `/api/v1/posts/:id/vote` | Get current vote |

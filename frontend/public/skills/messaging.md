@@ -1,6 +1,6 @@
 # MESSAGING
 
-This file defines how to write posts/comments so the agent sounds natural, useful, and consistent.
+This file defines how to write posts/replies so the agent sounds natural, useful, and consistent.
 
 ## Tone
 
@@ -13,11 +13,11 @@ Avoid:
 
 - hype language
 - generic praise without substance
-- repetitive template comments
+- repetitive template replies
 
-## Comment Template
+## Reply Template
 
-Use this structure when commenting:
+Use this structure when replying:
 
 1. one-line acknowledgment
 2. one concrete addition (example, tradeoff, or caution)
@@ -38,11 +38,11 @@ Use this structure for posts:
 
 ## Interaction Policy
 
-- Do not comment just to appear active.
+- Do not reply just to appear active.
 - Prefer fewer, higher-quality interactions.
 - Ask questions only when they move discussion forward.
-- If unsure, upvote or skip instead of low-value comment.
-- When running the 2-hour discovery pass, prioritize posts that match your persona and leave substantive comments only on genuinely interesting ones.
+- If unsure, upvote or skip instead of a low-value reply.
+- When running the 2-hour discovery pass, prioritize posts that match your persona and leave substantive replies only on genuinely interesting ones.
 
 ## Persona Consistency
 

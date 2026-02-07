@@ -11,6 +11,7 @@ function SitePost() {
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
   const [comments, setComments] = useState([])
+  const [recentVoters, setRecentVoters] = useState({ upvoters: [], downvoters: [] })
 
   useEffect(() => {
     loadData()
@@ -21,9 +22,14 @@ function SitePost() {
     try {
       const postData = await api.getSitePost(username, slug)
       const commentsData = await api.getComments(postData.post.id).catch(() => ({ comments: [] }))
+      const votersData = await api.getRecentVoters(postData.post.id, 5).catch(() => ({ upvoters: [], downvoters: [] }))
       setSite(postData.site)
       setPost(postData.post)
       setComments(commentsData.comments || [])
+      setRecentVoters({
+        upvoters: votersData.upvoters || [],
+        downvoters: votersData.downvoters || []
+      })
     } catch (error) {
       console.error('Failed to load post:', error)
     } finally {
@@ -77,7 +83,16 @@ function SitePost() {
     hour12: false
   }).format(new Date(post.created_at))
   const siteTheme = resolveSiteTheme(site?.theme)
-  const score = (post.upvotes || 0) - (post.downvotes || 0)
+  const upvotes = post.upvotes || 0
+  const downvotes = post.downvotes || 0
+  const replies = post.comments_count ?? comments.length
+  const views = post.view_count || 0
+  const upvoteHover = recentVoters.upvoters.length > 0
+    ? `Recent upvoters: ${recentVoters.upvoters.map(name => `@${name}`).join(', ')}`
+    : 'No recent upvoters'
+  const downvoteHover = recentVoters.downvoters.length > 0
+    ? `Recent downvoters: ${recentVoters.downvoters.map(name => `@${name}`).join(', ')}`
+    : 'No recent downvoters'
 
   return (
     <div className={`container site-shell site-theme-${siteTheme}`}>
@@ -94,8 +109,10 @@ function SitePost() {
 
           <div className="site-post-meta-row">
             <span className="site-post-meta-item">{date}</span>
-            <span className="site-post-meta-item">{post.view_count} views</span>
-            <span className="site-post-meta-item">score {score}</span>
+            <span className="site-post-meta-item">{views} views</span>
+            <span className="site-post-meta-item">{upvotes} upvotes</span>
+            <span className="site-post-meta-item">{downvotes} downvotes</span>
+            <span className="site-post-meta-item">{replies} replies</span>
           </div>
 
           {post.tags && post.tags.length > 0 && (
@@ -108,11 +125,11 @@ function SitePost() {
 
           <div className="site-post-toolbar">
             <div className="site-post-vote-group">
-              <button onClick={handleUpvote} className="btn btn-secondary" type="button">
-                ▲ Upvote
+              <button onClick={handleUpvote} className="btn btn-secondary" type="button" title={upvoteHover}>
+                ▲ Upvote ({upvotes})
               </button>
-              <button onClick={handleDownvote} className="btn btn-ghost" type="button">
-                ▼ Downvote
+              <button onClick={handleDownvote} className="btn btn-ghost" type="button" title={downvoteHover}>
+                ▼ Downvote ({downvotes})
               </button>
             </div>
           </div>
@@ -124,12 +141,12 @@ function SitePost() {
 
         <section className="site-comments">
           <div className="site-comments-head">
-            <h3>Discussion</h3>
-            <span>{comments.length} replies</span>
+            <h3>Replies</h3>
+            <span>{replies} replies</span>
           </div>
 
           {comments.length === 0 ? (
-            <p className="site-comments-empty">No comments yet. Start the discussion.</p>
+            <p className="site-comments-empty">No replies yet.</p>
           ) : (
             <div className="comments-list">
               {comments.map(comment => (

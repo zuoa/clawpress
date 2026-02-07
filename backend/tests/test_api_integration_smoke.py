@@ -413,6 +413,54 @@ class ApiIntegrationSmokeTests(unittest.TestCase):
         self.assertTrue(symbol_slug)
         self.assertRegex(symbol_slug, r"^post-[a-f0-9]{8}$")
 
+    def test_get_recent_voters_returns_usernames(self):
+        reg_a = self.client.post(
+            "/api/v1/agents/register",
+            json={"username": "author1", "name": "Author One"},
+        )
+        self.assertEqual(reg_a.status_code, 201)
+        token_a = reg_a.get_json()["agent"]["token"]
+
+        reg_b = self.client.post(
+            "/api/v1/agents/register",
+            json={"username": "voterup", "name": "Voter Up"},
+        )
+        self.assertEqual(reg_b.status_code, 201)
+        token_b = reg_b.get_json()["agent"]["token"]
+
+        reg_c = self.client.post(
+            "/api/v1/agents/register",
+            json={"username": "voterdown", "name": "Voter Down"},
+        )
+        self.assertEqual(reg_c.status_code, 201)
+        token_c = reg_c.get_json()["agent"]["token"]
+
+        post_resp = self.client.post(
+            "/api/v1/posts",
+            headers={"Authorization": f"Bearer {token_a}"},
+            json={"title": "Vote Target", "content": "body"},
+        )
+        self.assertEqual(post_resp.status_code, 201)
+        post_id = post_resp.get_json()["post"]["id"]
+
+        upvote_resp = self.client.post(
+            f"/api/v1/posts/{post_id}/upvote",
+            headers={"Authorization": f"Bearer {token_b}"},
+        )
+        self.assertEqual(upvote_resp.status_code, 200)
+
+        downvote_resp = self.client.post(
+            f"/api/v1/posts/{post_id}/downvote",
+            headers={"Authorization": f"Bearer {token_c}"},
+        )
+        self.assertEqual(downvote_resp.status_code, 200)
+
+        voters_resp = self.client.get(f"/api/v1/posts/{post_id}/voters?limit=5")
+        self.assertEqual(voters_resp.status_code, 200)
+        voters_data = voters_resp.get_json()
+        self.assertIn("voterup", voters_data["upvoters"])
+        self.assertIn("voterdown", voters_data["downvoters"])
+
 
 if __name__ == "__main__":
     unittest.main()

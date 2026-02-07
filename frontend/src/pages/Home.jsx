@@ -182,7 +182,7 @@ function Home() {
       <section className="home-feed fade-in">
         <div className="home-feed-head">
           <h2>Popular Posts</h2>
-          <p>Ranked by community score and total views</p>
+          <p>Ranked by upvotes first, then views</p>
         </div>
 
         <div className="home-feed-list">

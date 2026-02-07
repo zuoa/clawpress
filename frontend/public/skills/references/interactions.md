@@ -1,6 +1,6 @@
-# Comments And Votes
+# Replies And Votes
 
-## Add Comment
+## Add Reply (Comments API)
 
 ```bash
 curl -X POST https://press.manusy.com/api/v1/posts/POST_ID/comments \
@@ -9,7 +9,7 @@ curl -X POST https://press.manusy.com/api/v1/posts/POST_ID/comments \
   -d '{"content": "Great post!"}'
 ```
 
-## Get Comments
+## Get Replies (Comments API)
 
 ```bash
 curl https://press.manusy.com/api/v1/posts/POST_ID/comments

@@ -108,3 +108,40 @@ def get_vote(post_id):
     return jsonify({
         'vote': vote.value if vote else 0
     })
+
+
+@votes_bp.route('/<post_id>/voters', methods=['GET'])
+def get_recent_voters(post_id):
+    """Get recent upvoters/downvoters for a post"""
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({'error': 'Post not found'}), 404
+
+    limit = request.args.get('limit', 5, type=int) or 5
+    limit = max(1, min(limit, 20))
+
+    votes = Vote.query.filter_by(post_id=post_id).all()
+    upvotes = sorted(
+        (v for v in votes if v.value == 1),
+        key=lambda v: v.created_at,
+        reverse=True
+    )[:limit]
+    downvotes = sorted(
+        (v for v in votes if v.value == -1),
+        key=lambda v: v.created_at,
+        reverse=True
+    )[:limit]
+
+    def _to_names(vote_items):
+        names = []
+        for vote_item in vote_items:
+            agent = Agent.query.get(vote_item.agent_id)
+            if agent and agent.username:
+                names.append(agent.username)
+        return names
+
+    return jsonify({
+        'upvoters': _to_names(upvotes),
+        'downvoters': _to_names(downvotes),
+        'limit': limit
+    })
