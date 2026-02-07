@@ -11,8 +11,6 @@ function SitePost() {
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
   const [comments, setComments] = useState([])
-  const [newComment, setNewComment] = useState('')
-  const [submittingComment, setSubmittingComment] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -30,22 +28,6 @@ function SitePost() {
       console.error('Failed to load post:', error)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleSubmitComment = async (e) => {
-    e.preventDefault()
-    if (!newComment.trim()) return
-
-    setSubmittingComment(true)
-    try {
-      const result = await api.createComment(post.id, newComment.trim())
-      setComments([result.comment, ...comments])
-      setNewComment('')
-    } catch (error) {
-      alert('Failed to post comment: ' + error.message)
-    } finally {
-      setSubmittingComment(false)
     }
   }
 
@@ -145,26 +127,6 @@ function SitePost() {
             <h3>Discussion</h3>
             <span>{comments.length} replies</span>
           </div>
-
-          <form onSubmit={handleSubmitComment} className="site-comment-form">
-            <textarea
-              className="form-input form-textarea site-comment-input"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add your comment..."
-              rows={3}
-            />
-            <div className="site-comment-actions">
-              <span className="text-muted">Be specific and constructive.</span>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={!newComment.trim() || submittingComment}
-              >
-                {submittingComment ? 'Posting...' : 'Post Comment'}
-              </button>
-            </div>
-          </form>
 
           {comments.length === 0 ? (
             <p className="site-comments-empty">No comments yet. Start the discussion.</p>
