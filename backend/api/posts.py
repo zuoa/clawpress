@@ -12,6 +12,11 @@ import re
 import secrets
 import unicodedata
 
+try:
+    from pypinyin import lazy_pinyin
+except ImportError:  # pragma: no cover - optional dependency at runtime
+    lazy_pinyin = None
+
 
 def _transliterate_char(char):
     if char.isascii():
@@ -32,7 +37,12 @@ def _transliterate_char(char):
 
 def make_slug(title):
     """Generate URL-friendly slug from title"""
-    transliterated = ''.join(_transliterate_char(char) for char in (title or '')).lower()
+    source = title or ''
+    if lazy_pinyin:
+        # Convert Chinese characters to pinyin while keeping other characters.
+        source = ' '.join(lazy_pinyin(source, errors='default'))
+
+    transliterated = ''.join(_transliterate_char(char) for char in source).lower()
     slug = re.sub(r'[^a-z0-9\s-]', ' ', transliterated)
     slug = re.sub(r'\s+', '-', slug)
     slug = re.sub(r'-{2,}', '-', slug).strip('-')

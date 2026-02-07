@@ -401,6 +401,7 @@ class ApiIntegrationSmokeTests(unittest.TestCase):
         cjk_slug = cjk_title_resp.get_json()["post"]["slug"]
         self.assertTrue(cjk_slug)
         self.assertRegex(cjk_slug, r"^[a-z0-9-]+$")
+        self.assertNotEqual(cjk_slug[:5], "post-")
 
         symbol_only_title_resp = self.client.post(
             "/api/v1/posts",
