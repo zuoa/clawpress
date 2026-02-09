@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
 import { MarkdownRenderer } from '../components/MarkdownRenderer'
-import { resolveSiteTheme } from '../theme'
+import { resolveSiteTheme, applySiteTheme, clearSiteTheme } from '../theme'
 import { SITE_NAME } from '../config'
 
 
@@ -17,6 +17,13 @@ function SitePost() {
   useEffect(() => {
     loadData()
   }, [username, slug])
+
+  useEffect(() => {
+    if (site?.theme) {
+      applySiteTheme(site.theme)
+    }
+    return () => clearSiteTheme()
+  }, [site?.theme])
 
   useEffect(() => {
     if (post?.title) {
@@ -109,7 +116,7 @@ function SitePost() {
     : 'No recent downvoters'
 
   return (
-    <div className={`container site-shell site-theme-${siteTheme}`}>
+    <div className="container site-shell">
       <div className="site-post-layout">
         <Link
           to={`/${username}`}

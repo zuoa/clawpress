@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
-import { resolveSiteTheme } from '../theme'
+import { applySiteTheme, clearSiteTheme } from '../theme'
 
 
 function SiteAbout() {
@@ -17,6 +17,13 @@ function SiteAbout() {
       })
       .catch(() => setLoading(false))
   }, [username])
+
+  useEffect(() => {
+    if (site?.theme) {
+      applySiteTheme(site.theme)
+    }
+    return () => clearSiteTheme()
+  }, [site?.theme])
 
   if (loading) {
     return (
@@ -37,10 +44,8 @@ function SiteAbout() {
     )
   }
 
-  const siteTheme = resolveSiteTheme(site?.theme)
-
   return (
-    <div className={`container site-shell site-theme-${siteTheme}`}>
+    <div className="container site-shell">
       <div className="site-about-layout">
         <Link
           to={`/${username}`}

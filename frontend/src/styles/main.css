@@ -20,6 +20,26 @@
   --success-color: #22c55e;
   --error-color: #ef4444;
   --warning-color: #f59e0b;
+  --site-page-bg: var(--bg-secondary);
+  --site-header-bg: rgba(248, 248, 248, 0.95);
+  --site-nav-shell-bg: #ffffff;
+  --site-nav-shell-border: #e8e8e8;
+  --site-nav-link-color: #555;
+  --site-nav-link-hover-bg: #f5f5f5;
+  --site-nav-link-hover-color: #111;
+  --site-nav-link-active-bg: #111111;
+  --site-nav-link-active-color: #fafafa;
+  --site-footer-bg: var(--bg-primary);
+  --site-footer-border: var(--border-color);
+  --site-footer-text: var(--text-muted);
+  --site-footer-link: var(--text-secondary);
+  --site-bg: transparent;
+  --site-card-bg: var(--bg-primary);
+  --site-border: var(--border-color);
+  --site-soft-text: var(--text-secondary);
+  --site-muted-text: var(--text-muted);
+  --site-tag-bg: var(--bg-tertiary);
+  --site-tag-color: var(--text-secondary);
 
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -70,7 +90,7 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-secondary);
+  background-color: var(--site-page-bg);
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
@@ -216,14 +236,14 @@ h3 { font-size: 1.25rem; }
 }
 
 .nav-shell {
-  border: 1px solid #e8e8e8;
-  background: #ffffff;
+  border: 1px solid var(--site-nav-shell-border);
+  background: var(--site-nav-shell-bg);
   border-radius: 999px;
   padding: 0.24rem;
 }
 
 .nav-link {
-  color: #555;
+  color: var(--site-nav-link-color);
   font-size: 0.82rem;
   font-weight: 600;
   line-height: 1;
@@ -233,13 +253,13 @@ h3 { font-size: 1.25rem; }
 }
 
 .nav-link:hover {
-  color: #111;
-  background: #f5f5f5;
+  color: var(--site-nav-link-hover-color);
+  background: var(--site-nav-link-hover-bg);
 }
 
 .nav-link.active {
-  color: #fafafa;
-  background: #111111;
+  color: var(--site-nav-link-active-color);
+  background: var(--site-nav-link-active-bg);
 }
 
 .header-note {
@@ -259,7 +279,7 @@ h3 { font-size: 1.25rem; }
 }
 
 .header-subsite {
-  background: rgba(248, 248, 248, 0.95);
+  background: var(--site-header-bg);
 }
 
 /* Buttons */
@@ -461,11 +481,11 @@ h3 { font-size: 1.25rem; }
 
 /* Footer */
 .footer {
-  background: var(--bg-primary);
-  border-top: 1px solid var(--border-color);
+  background: var(--site-footer-bg);
+  border-top: 1px solid var(--site-footer-border);
   padding: var(--spacing-lg) 0;
   margin-top: var(--spacing-xl);
-  color: var(--text-muted);
+  color: var(--site-footer-text);
   font-size: 0.82rem;
 }
 
@@ -490,7 +510,7 @@ h3 { font-size: 1.25rem; }
 }
 
 .footer-link {
-  color: var(--text-secondary);
+  color: var(--site-footer-link);
 }
 
 .footer-link:hover {
@@ -498,18 +518,11 @@ h3 { font-size: 1.25rem; }
 }
 
 .footer-note {
-  color: var(--text-muted);
+  color: var(--site-footer-text);
 }
 
 /* Site Theme */
 .site-shell {
-  --site-bg: transparent;
-  --site-card-bg: var(--bg-primary);
-  --site-border: var(--border-color);
-  --site-soft-text: var(--text-secondary);
-  --site-muted-text: var(--text-muted);
-  --site-tag-bg: var(--bg-tertiary);
-  --site-tag-color: var(--text-secondary);
   background: var(--site-bg);
   border-radius: 18px;
   padding: var(--spacing-md) 0;
@@ -533,7 +546,20 @@ h3 { font-size: 1.25rem; }
   color: var(--site-tag-color);
 }
 
-.site-theme-github {
+body[data-site-theme="github"] {
+  --site-page-bg: #f3f6fa;
+  --site-header-bg: rgba(246, 248, 250, 0.94);
+  --site-nav-shell-bg: #ffffff;
+  --site-nav-shell-border: #d0d7de;
+  --site-nav-link-color: #57606a;
+  --site-nav-link-hover-bg: #f3f4f6;
+  --site-nav-link-hover-color: #1f2328;
+  --site-nav-link-active-bg: #24292f;
+  --site-nav-link-active-color: #f6f8fa;
+  --site-footer-bg: #ffffff;
+  --site-footer-border: #d0d7de;
+  --site-footer-text: #6e7781;
+  --site-footer-link: #57606a;
   --site-bg: #f6f8fa;
   --site-card-bg: #ffffff;
   --site-border: #d0d7de;
@@ -543,7 +569,20 @@ h3 { font-size: 1.25rem; }
   --site-tag-color: #0969da;
 }
 
-.site-theme-notion {
+body[data-site-theme="notion"] {
+  --site-page-bg: #f4f3ef;
+  --site-header-bg: rgba(247, 246, 243, 0.95);
+  --site-nav-shell-bg: #ffffff;
+  --site-nav-shell-border: #e9e5df;
+  --site-nav-link-color: #5f5c56;
+  --site-nav-link-hover-bg: #efece6;
+  --site-nav-link-hover-color: #37352f;
+  --site-nav-link-active-bg: #37352f;
+  --site-nav-link-active-color: #f7f6f3;
+  --site-footer-bg: #ffffff;
+  --site-footer-border: #e9e5df;
+  --site-footer-text: #78726d;
+  --site-footer-link: #5f5c56;
   --site-bg: #f7f6f3;
   --site-card-bg: #ffffff;
   --site-border: #e9e5df;
@@ -551,6 +590,52 @@ h3 { font-size: 1.25rem; }
   --site-muted-text: #78726d;
   --site-tag-bg: #efece6;
   --site-tag-color: #56524d;
+}
+
+body[data-site-theme="vsc"] {
+  --site-page-bg: #0f1117;
+  --site-header-bg: rgba(19, 23, 32, 0.92);
+  --site-nav-shell-bg: #1f2430;
+  --site-nav-shell-border: #30363d;
+  --site-nav-link-color: #c9d1d9;
+  --site-nav-link-hover-bg: #2d333b;
+  --site-nav-link-hover-color: #f0f6fc;
+  --site-nav-link-active-bg: #3794ff;
+  --site-nav-link-active-color: #ffffff;
+  --site-footer-bg: #11161f;
+  --site-footer-border: #30363d;
+  --site-footer-text: #8b949e;
+  --site-footer-link: #c9d1d9;
+  --site-bg: #161b22;
+  --site-card-bg: #1f2430;
+  --site-border: #30363d;
+  --site-soft-text: #9da7b3;
+  --site-muted-text: #7d8590;
+  --site-tag-bg: #2d333b;
+  --site-tag-color: #8ab4f8;
+}
+
+body[data-site-theme="academic"] {
+  --site-page-bg: #f6f5f2;
+  --site-header-bg: rgba(249, 248, 245, 0.95);
+  --site-nav-shell-bg: #ffffff;
+  --site-nav-shell-border: #d9d4ca;
+  --site-nav-link-color: #4d473f;
+  --site-nav-link-hover-bg: #ece8e0;
+  --site-nav-link-hover-color: #2c2924;
+  --site-nav-link-active-bg: #5f564b;
+  --site-nav-link-active-color: #f9f8f5;
+  --site-footer-bg: #ffffff;
+  --site-footer-border: #d9d4ca;
+  --site-footer-text: #6f675c;
+  --site-footer-link: #4d473f;
+  --site-bg: #fcfbf8;
+  --site-card-bg: #ffffff;
+  --site-border: #d9d4ca;
+  --site-soft-text: #4d473f;
+  --site-muted-text: #6f675c;
+  --site-tag-bg: #ece8e0;
+  --site-tag-color: #5f564b;
 }
 
 /* Site Profile */

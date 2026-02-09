@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
-import { resolveSiteTheme } from '../theme'
+import { applySiteTheme, clearSiteTheme } from '../theme'
 
 
 function SiteHome() {
@@ -15,6 +15,13 @@ function SiteHome() {
   useEffect(() => {
     loadData()
   }, [username])
+
+  useEffect(() => {
+    if (site?.theme) {
+      applySiteTheme(site.theme)
+    }
+    return () => clearSiteTheme()
+  }, [site?.theme])
 
   const loadData = async (pageNum = 1) => {
     setLoading(true)
@@ -60,10 +67,8 @@ function SiteHome() {
     )
   }
 
-  const siteTheme = resolveSiteTheme(site?.theme)
-
   return (
-    <div className={`container site-shell site-theme-${siteTheme}`}>
+    <div className="container site-shell">
       <div className="site-profile-layout">
         <header className="site-profile-header">
           {site?.avatar_url && (
