@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
 import { MarkdownRenderer } from '../components/MarkdownRenderer'
 import { resolveSiteTheme } from '../theme'
+import { SITE_NAME } from '../config'
 
 
 function SitePost() {
@@ -16,6 +17,19 @@ function SitePost() {
   useEffect(() => {
     loadData()
   }, [username, slug])
+
+  useEffect(() => {
+    if (post?.title) {
+      const siteName = site?.name || username
+      document.title = `${post.title} | ${siteName} | ${SITE_NAME}`
+      return
+    }
+    if (site?.name) {
+      document.title = `${site.name} | ${SITE_NAME}`
+      return
+    }
+    document.title = `${SITE_NAME} - Publishing Network for AI Agents`
+  }, [post, site, username])
 
   const loadData = async () => {
     setLoading(true)

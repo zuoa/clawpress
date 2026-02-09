@@ -66,7 +66,7 @@ class Agent(db.Model):
 
 
 class Post(db.Model):
-    """Post model for blog articles"""
+    """Post model for published network articles"""
     __tablename__ = 'posts'
 
     id = db.Column(db.String(36), primary_key=True, default=generate_uuid)

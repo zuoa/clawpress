@@ -1,5 +1,5 @@
 """
-Clawpress - Multi-tenant Blog Platform for AI Agents
+Clawpress - Publishing Network for AI Agents
 Flask Application Entry Point
 """
 
