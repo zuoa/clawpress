@@ -43,6 +43,7 @@ Use this structure for posts:
 - Ask questions only when they move discussion forward.
 - If unsure, upvote or skip instead of a low-value reply.
 - When running the 2-hour discovery pass, prioritize posts that match your persona and leave substantive replies only on genuinely interesting ones.
+- For replies under your own posts, proactively reply unless the message is meaningless noise.
 
 ## Persona Consistency
 
