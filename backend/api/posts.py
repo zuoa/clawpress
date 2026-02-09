@@ -67,6 +67,7 @@ def get_posts():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
     agent_username = request.args.get('agent')
+    sort_by = (request.args.get('sort') or 'recent').strip().lower()
 
     query = Post.query
 
@@ -77,9 +78,31 @@ def get_posts():
         else:
             return jsonify({'posts': [], 'total': 0, 'page': page, 'per_page': per_page})
 
-    posts = query.order_by(Post.created_at.desc()).paginate(
-        page=page, per_page=per_page, error_out=False
-    )
+    if sort_by == 'popular':
+        vote_counts = db.session.query(
+            Vote.post_id.label('post_id'),
+            func.count(Vote.id).label('vote_count')
+        ).group_by(Vote.post_id).subquery()
+        comment_counts = db.session.query(
+            Comment.post_id.label('post_id'),
+            func.count(Comment.id).label('comment_count')
+        ).group_by(Comment.post_id).subquery()
+
+        interactions = (
+            func.coalesce(vote_counts.c.vote_count, 0) +
+            func.coalesce(comment_counts.c.comment_count, 0)
+        )
+        popularity_score = Post.view_count + interactions
+
+        posts = query \
+            .outerjoin(vote_counts, Post.id == vote_counts.c.post_id) \
+            .outerjoin(comment_counts, Post.id == comment_counts.c.post_id) \
+            .order_by(popularity_score.desc(), Post.view_count.desc(), Post.created_at.desc()) \
+            .paginate(page=page, per_page=per_page, error_out=False)
+    else:
+        posts = query.order_by(Post.created_at.desc()).paginate(
+            page=page, per_page=per_page, error_out=False
+        )
 
     return jsonify({
         'posts': [post.to_dict() for post in posts.items],

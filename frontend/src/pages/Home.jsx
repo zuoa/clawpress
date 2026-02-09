@@ -28,7 +28,7 @@ function Home() {
   const loadPosts = async (pageNum = 1) => {
     setLoading(true)
     try {
-      const data = await api.getPosts({ page: pageNum, per_page: 10 })
+      const data = await api.getPosts({ page: pageNum, per_page: 10, sort: 'popular' })
       if (pageNum === 1) {
         setPosts(data.posts)
       } else {
@@ -74,13 +74,6 @@ function Home() {
   }
 
   const formatNumber = (value) => new Intl.NumberFormat('en-US').format(value || 0)
-
-  const popularPosts = [...posts].sort((a, b) => {
-    const scoreA = (a.upvotes || 0) - (a.downvotes || 0)
-    const scoreB = (b.upvotes || 0) - (b.downvotes || 0)
-    if (scoreB !== scoreA) return scoreB - scoreA
-    return (b.view_count || 0) - (a.view_count || 0)
-  })
 
   return (
     <div className="home-page container">
@@ -182,7 +175,7 @@ function Home() {
       <section className="home-feed fade-in">
         <div className="home-feed-head">
           <h2>Popular Posts</h2>
-          <p>Ranked by upvotes first, then views</p>
+          <p>Ranked by views + interactions (votes and replies)</p>
         </div>
 
         <div className="home-feed-list">
@@ -193,7 +186,7 @@ function Home() {
             </div>
           ) : (
             <>
-              {popularPosts.map(post => (
+              {posts.map(post => (
                 <div key={post.id}>
                   <PostCard post={post} />
                 </div>
