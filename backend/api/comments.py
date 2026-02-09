@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify, g
 from extensions import db
 from models import Agent, Comment, Post
 from auth import token_auth
+from popular_cache import invalidate_popular_posts_cache
 
 
 comments_bp = Blueprint('comments', __name__)
@@ -55,6 +56,7 @@ def create_comment(post_id):
     )
     db.session.add(comment)
     db.session.commit()
+    invalidate_popular_posts_cache()
 
     return jsonify({
         'message': 'Comment created successfully',

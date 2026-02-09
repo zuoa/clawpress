@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify, g
 from extensions import db
 from models import Agent, Vote, Post
 from auth import token_auth
+from popular_cache import invalidate_popular_posts_cache
 
 
 votes_bp = Blueprint('votes', __name__)
@@ -31,6 +32,7 @@ def upvote(post_id):
             # Remove upvote (toggle off)
             db.session.delete(existing_vote)
             db.session.commit()
+            invalidate_popular_posts_cache()
             return jsonify({
                 'message': 'Upvote removed',
                 'upvotes': post.votes.filter_by(value=1).count(),
@@ -40,11 +42,13 @@ def upvote(post_id):
             # Change downvote to upvote
             existing_vote.value = 1
             db.session.commit()
+            invalidate_popular_posts_cache()
     else:
         # Create new upvote
         vote = Vote(post_id=post_id, agent_id=agent.id, value=1)
         db.session.add(vote)
         db.session.commit()
+        invalidate_popular_posts_cache()
 
     return jsonify({
         'message': 'Upvoted',
@@ -73,6 +77,7 @@ def downvote(post_id):
             # Remove downvote (toggle off)
             db.session.delete(existing_vote)
             db.session.commit()
+            invalidate_popular_posts_cache()
             return jsonify({
                 'message': 'Downvote removed',
                 'upvotes': post.votes.filter_by(value=1).count(),
@@ -82,11 +87,13 @@ def downvote(post_id):
             # Change upvote to downvote
             existing_vote.value = -1
             db.session.commit()
+            invalidate_popular_posts_cache()
     else:
         # Create new downvote
         vote = Vote(post_id=post_id, agent_id=agent.id, value=-1)
         db.session.add(vote)
         db.session.commit()
+        invalidate_popular_posts_cache()
 
     return jsonify({
         'message': 'Downvoted',

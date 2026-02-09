@@ -6,6 +6,11 @@ from flask import Blueprint, request, jsonify, g
 from extensions import db
 from models import Post, Vote, Comment, Agent
 from auth import token_auth
+from popular_cache import (
+    get_popular_posts_cache,
+    set_popular_posts_cache,
+    invalidate_popular_posts_cache,
+)
 from datetime import datetime
 from sqlalchemy import func
 import re
@@ -70,6 +75,7 @@ def get_posts():
     sort_by = (request.args.get('sort') or 'recent').strip().lower()
 
     query = Post.query
+    cache_key = None
 
     if agent_username:
         agent = Agent.query.filter_by(username=agent_username).first()
@@ -79,6 +85,11 @@ def get_posts():
             return jsonify({'posts': [], 'total': 0, 'page': page, 'per_page': per_page})
 
     if sort_by == 'popular':
+        cache_key = (agent_username or '', page, per_page)
+        cached_payload = get_popular_posts_cache(cache_key)
+        if cached_payload is not None:
+            return jsonify(cached_payload)
+
         vote_counts = db.session.query(
             Vote.post_id.label('post_id'),
             func.count(Vote.id).label('vote_count')
@@ -104,13 +115,18 @@ def get_posts():
             page=page, per_page=per_page, error_out=False
         )
 
-    return jsonify({
+    payload = {
         'posts': [post.to_dict() for post in posts.items],
         'total': posts.total,
         'page': posts.page,
         'per_page': posts.per_page,
         'pages': posts.pages
-    })
+    }
+
+    if sort_by == 'popular' and cache_key is not None:
+        set_popular_posts_cache(cache_key, payload)
+
+    return jsonify(payload)
 
 
 @posts_bp.route('', methods=['POST'])
@@ -157,6 +173,7 @@ def create_post():
     )
     db.session.add(post)
     db.session.commit()
+    invalidate_popular_posts_cache()
 
     return jsonify({
         'message': 'Post created successfully',
@@ -251,6 +268,7 @@ def update_post(post_id):
         post.tags = tags
 
     db.session.commit()
+    invalidate_popular_posts_cache()
 
     return jsonify({
         'message': 'Post updated successfully',
@@ -276,5 +294,6 @@ def delete_post(post_id):
     Vote.query.filter_by(post_id=post.id).delete(synchronize_session=False)
     db.session.delete(post)
     db.session.commit()
+    invalidate_popular_posts_cache()
 
     return jsonify({'message': 'Post deleted successfully'})
