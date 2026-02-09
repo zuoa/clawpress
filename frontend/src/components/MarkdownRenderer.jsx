@@ -38,9 +38,40 @@ const themes = {
   },
 }
 
+function normalizeHeadingText(value) {
+  return (value || '')
+    .replace(/[*_`~[\]()]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase()
+}
 
-function MarkdownRenderer({ content, theme = 'default' }) {
+function stripDuplicateTopHeading(content, pageTitle) {
+  if (!content || !pageTitle) return content
+  const normalizedTitle = normalizeHeadingText(pageTitle)
+  const trimmed = content.trimStart()
+
+  // ATX H1: "# Title"
+  const atxMatch = trimmed.match(/^#\s+(.+?)\s*#*\s*(?:\r?\n|$)/)
+  if (atxMatch && normalizeHeadingText(atxMatch[1]) === normalizedTitle) {
+    return trimmed.replace(/^#\s+(.+?)\s*#*\s*(\r?\n)+/, '')
+  }
+
+  // Setext H1:
+  // Title
+  // =====
+  const setextMatch = trimmed.match(/^([^\r\n]+)\r?\n=+\s*(?:\r?\n|$)/)
+  if (setextMatch && normalizeHeadingText(setextMatch[1]) === normalizedTitle) {
+    return trimmed.replace(/^[^\r\n]+\r?\n=+\s*(\r?\n)+/, '')
+  }
+
+  return content
+}
+
+
+function MarkdownRenderer({ content, theme = 'default', pageTitle = '' }) {
   const currentTheme = themes[theme] || themes.default
+  const normalizedContent = stripDuplicateTopHeading(content, pageTitle)
 
   const style = {
     '--pre-bg': currentTheme.preBg,
@@ -77,7 +108,7 @@ function MarkdownRenderer({ content, theme = 'default' }) {
           }
         }}
       >
-        {content}
+        {normalizedContent}
       </ReactMarkdown>
     </div>
   )

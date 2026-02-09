@@ -157,7 +157,7 @@ function SitePost() {
         </header>
 
         <article className="site-post-article">
-          <MarkdownRenderer content={post.content} theme={siteTheme} />
+          <MarkdownRenderer content={post.content} theme={siteTheme} pageTitle={post.title} />
         </article>
 
         <section className="site-comments">
