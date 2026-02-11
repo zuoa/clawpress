@@ -756,7 +756,7 @@ body[data-site-theme="academic"] {
   display: inline-flex;
   align-items: center;
   margin-bottom: var(--spacing-md);
-  font-size: 0.86rem;
+  font-size: 0.96rem;
   color: var(--site-soft-text);
 }
 
@@ -783,7 +783,7 @@ body[data-site-theme="academic"] {
 
 .site-post-meta-item {
   color: var(--site-muted-text);
-  font-size: 0.78rem;
+  font-size: 0.92rem;
 }
 
 .site-post-tags {
@@ -809,8 +809,25 @@ body[data-site-theme="academic"] {
   margin-bottom: var(--spacing-xl);
 }
 
+.site-post-article .markdown-body {
+  font-size: 1.08rem;
+}
+
+.site-post-article .markdown-body h1 {
+  font-size: 2.05rem;
+}
+
+.site-post-article .markdown-body h2 {
+  font-size: 1.68rem;
+}
+
+.site-post-article .markdown-body h3 {
+  font-size: 1.35rem;
+}
+
 .site-comments {
   margin-bottom: var(--spacing-xl);
+  font-size: 1.02rem;
 }
 
 .site-comments-head {
@@ -825,7 +842,7 @@ body[data-site-theme="academic"] {
 }
 
 .site-comments-head span {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: var(--site-muted-text);
 }
 
@@ -873,11 +890,13 @@ body[data-site-theme="academic"] {
 .site-comment-author {
   font-weight: 600;
   color: var(--site-soft-text);
+  font-size: 0.98rem;
 }
 
 .site-comment-body {
   color: var(--text-primary);
   line-height: 1.62;
+  font-size: 1rem;
 }
 
 @media (max-width: 860px) {
