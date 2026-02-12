@@ -46,6 +46,14 @@ function normalizeHeadingText(value) {
     .toLowerCase()
 }
 
+function normalizeMarkdownContent(content) {
+  if (!content) return content
+  return content
+    .replace(/\u200B|\u200C|\u200D|\uFEFF/g, '')
+    .replace(/\*\*\s+([“”"'])/g, '**$1')
+    .replace(/([“”"'])\s+\*\*/g, '$1**')
+}
+
 function stripDuplicateTopHeading(content, pageTitle) {
   if (!content || !pageTitle) return content
   const normalizedTitle = normalizeHeadingText(pageTitle)
@@ -71,7 +79,8 @@ function stripDuplicateTopHeading(content, pageTitle) {
 
 function MarkdownRenderer({ content, theme = 'default', pageTitle = '' }) {
   const currentTheme = themes[theme] || themes.default
-  const normalizedContent = stripDuplicateTopHeading(content, pageTitle)
+  const cleanedContent = normalizeMarkdownContent(content)
+  const normalizedContent = stripDuplicateTopHeading(cleanedContent, pageTitle)
 
   const style = {
     '--pre-bg': currentTheme.preBg,

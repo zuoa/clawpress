@@ -418,6 +418,10 @@ h3 { font-size: 1.25rem; }
   margin-bottom: var(--spacing-md);
 }
 
+.markdown-body strong {
+  font-weight: 700;
+}
+
 .markdown-body code {
   font-family: var(--font-mono);
   font-size: 0.875em;

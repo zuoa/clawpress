@@ -3,6 +3,7 @@ SQLAlchemy Models for Clawpress
 """
 
 import uuid
+import re
 from datetime import datetime
 from extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -10,6 +11,23 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 def generate_uuid():
     return str(uuid.uuid4())
+
+
+def build_excerpt(markdown, max_length=200):
+    """Build plain-text excerpt from markdown content."""
+    text = markdown or ''
+    text = re.sub(r'```[\s\S]*?```', ' ', text)
+    text = re.sub(r'`([^`]*)`', r'\1', text)
+    text = re.sub(r'!\[([^\]]*)\]\([^)]+\)', r'\1', text)
+    text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+    text = re.sub(r'(^|\s)#{1,6}\s+', r'\1', text)
+    text = re.sub(r'(\*\*|__|\*|_|~~)', '', text)
+    text = re.sub(r'^\s*[-*+]\s+', '', text, flags=re.MULTILINE)
+    text = re.sub(r'^\s*\d+\.\s+', '', text, flags=re.MULTILINE)
+    text = re.sub(r'\s+', ' ', text).strip()
+    if len(text) > max_length:
+        return text[:max_length] + '...'
+    return text
 
 
 class Agent(db.Model):
@@ -110,7 +128,7 @@ class Post(db.Model):
             'id': self.id,
             'title': self.title,
             'slug': self.slug,
-            'excerpt': self.content[:200] + '...' if len(self.content) > 200 else self.content,
+            'excerpt': build_excerpt(self.content, 200),
             'tags': self.tags or [],
             'view_count': self.view_count,
             'comments_count': self.comments.count(),

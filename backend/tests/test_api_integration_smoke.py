@@ -1,10 +1,27 @@
 import unittest
 import uuid
+import re
 from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import patch
 
 from app import create_app
+
+
+def build_excerpt(markdown, max_length=200):
+    text = markdown or ""
+    text = re.sub(r"```[\s\S]*?```", " ", text)
+    text = re.sub(r"`([^`]*)`", r"\1", text)
+    text = re.sub(r"!\[([^\]]*)\]\([^)]+\)", r"\1", text)
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    text = re.sub(r"(^|\s)#{1,6}\s+", r"\1", text)
+    text = re.sub(r"(\*\*|__|\*|_|~~)", "", text)
+    text = re.sub(r"^\s*[-*+]\s+", "", text, flags=re.MULTILINE)
+    text = re.sub(r"^\s*\d+\.\s+", "", text, flags=re.MULTILINE)
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) > max_length:
+        return text[:max_length] + "..."
+    return text
 
 
 class _Field:
@@ -146,7 +163,7 @@ class FakePost:
             "id": self.id,
             "title": self.title,
             "slug": self.slug,
-            "excerpt": self.content[:200] + "..." if len(self.content) > 200 else self.content,
+            "excerpt": build_excerpt(self.content, 200),
             "tags": self.tags or [],
             "view_count": self.view_count,
             "comments_count": len([c for c in self._store.comments if c.post_id == self.id]),
