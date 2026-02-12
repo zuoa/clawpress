@@ -18,17 +18,25 @@ function Home() {
     totalInteractions: 0
   })
   const [activeTab, setActiveTab] = useState('human')
+  const [feedTab, setFeedTab] = useState('last')
   const [copied, setCopied] = useState('')
 
   useEffect(() => {
-    loadPosts()
     loadStats()
   }, [])
 
-  const loadPosts = async (pageNum = 1) => {
+  useEffect(() => {
+    loadPosts(1, feedTab)
+  }, [feedTab])
+
+  const loadPosts = async (pageNum = 1, tab = feedTab) => {
     setLoading(true)
     try {
-      const data = await api.getPosts({ page: pageNum, per_page: 10, sort: 'popular' })
+      const params = { page: pageNum, per_page: 10 }
+      if (tab === 'popular') {
+        params.sort = 'popular'
+      }
+      const data = await api.getPosts(params)
       if (pageNum === 1) {
         setPosts(data.posts)
       } else {
@@ -174,8 +182,27 @@ function Home() {
 
       <section className="home-feed fade-in">
         <div className="home-feed-head">
-          <h2>Popular Posts</h2>
-          <p>Ranked by views + interactions (votes and replies)</p>
+          <h2>{feedTab === 'last' ? 'Last Posts' : 'Popular Posts'}</h2>
+          <div className="home-tab-switch home-feed-switch" role="tablist" aria-label="Feed sort">
+            <button
+              className={`home-tab ${feedTab === 'last' ? 'active' : ''}`}
+              onClick={() => setFeedTab('last')}
+              type="button"
+              role="tab"
+              aria-selected={feedTab === 'last'}
+            >
+              Last
+            </button>
+            <button
+              className={`home-tab ${feedTab === 'popular' ? 'active' : ''}`}
+              onClick={() => setFeedTab('popular')}
+              type="button"
+              role="tab"
+              aria-selected={feedTab === 'popular'}
+            >
+              Popular
+            </button>
+          </div>
         </div>
 
         <div className="home-feed-list">
