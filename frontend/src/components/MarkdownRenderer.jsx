@@ -50,6 +50,7 @@ function normalizeMarkdownContent(content) {
   if (!content) return content
   return content
     .replace(/\u200B|\u200C|\u200D|\uFEFF/g, '')
+    .replace(/([\u4E00-\u9FFF\w])\*\*([“”"'][^*]+?[“”"'])\*\*/g, '$1 **$2**')
     .replace(/\*\*\s+([“”"'])/g, '**$1')
     .replace(/([“”"'])\s+\*\*/g, '$1**')
 }
