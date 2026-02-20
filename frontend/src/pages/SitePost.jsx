@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import api from '../api/client'
 import { MarkdownRenderer } from '../components/MarkdownRenderer'
 import { resolveSiteTheme, applySiteTheme, clearSiteTheme } from '../theme'
@@ -24,19 +25,6 @@ function SitePost() {
     }
     return () => clearSiteTheme()
   }, [site?.theme])
-
-  useEffect(() => {
-    if (post?.title) {
-      const siteName = site?.name || username
-      document.title = `${post.title} | ${siteName} | ${SITE_NAME}`
-      return
-    }
-    if (site?.name) {
-      document.title = `${site.name} | ${SITE_NAME}`
-      return
-    }
-    document.title = `${SITE_NAME} - Publishing Network for AI Agents`
-  }, [post, site, username])
 
   const loadData = async () => {
     setLoading(true)
@@ -109,14 +97,55 @@ function SitePost() {
   const replies = post.comments_count ?? comments.length
   const views = post.view_count || 0
   const upvoteHover = recentVoters.upvoters.length > 0
-    ? `Recent upvoters: ${recentVoters.upvoters.map(name => `@${name}`).join(', ')}`
+    ? `Recent upvoters: ${recentVoters.upvoters.map(name => "@"+name).join(', ')}`
     : 'No recent upvoters'
   const downvoteHover = recentVoters.downvoters.length > 0
-    ? `Recent downvoters: ${recentVoters.downvoters.map(name => `@${name}`).join(', ')}`
+    ? `Recent downvoters: ${recentVoters.downvoters.map(name => "@"+name).join(', ')}`
     : 'No recent downvoters'
+
+  // Generate description from content (first 160 chars, strip markdown)
+  const getDescription = (content) => {
+    if (!content) return ''
+    const plainText = content
+      .replace(/#{1,6}\s/g, '')
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      .replace(/\*(.+?)\*/g, '$1')
+      .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+      .replace(/`{1,3}[^`]*`{1,3}/g, '')
+      .replace(/\n+/g, ' ')
+      .trim()
+    return plainText.length > 160 ? plainText.substring(0, 157) + '...' : plainText
+  }
+
+  // Build the full URL for the post
+  const postUrl = `https://press.manusy.com/${username}/posts/${slug}`
+  const siteName = site?.name || username
 
   return (
     <div className="container site-shell">
+      <Helmet>
+        <title>{post ? `${post.title} | ${siteName} | ${SITE_NAME}` : `${SITE_NAME}`}</title>
+        <meta name="description" content={post ? getDescription(post.content) : 'Clawpress posts'} />
+        
+        {/* OpenGraph */}
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={post ? post.title : SITE_NAME} />
+        <meta property="og:description" content={post ? getDescription(post.content) : 'Clawpress posts'} />
+        <meta property="og:image" content="/logo.jpg" />
+        <meta property="og:url" content={postUrl} />
+        <meta property="article:author" content={username} />
+        {post?.tags?.map(tag => (
+          <meta key={tag} property="article:tag" content={tag} />
+        ))}
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post ? post.title : SITE_NAME} />
+        <meta name="twitter:description" content={post ? getDescription(post.content) : 'Clawpress posts'} />
+        <meta name="twitter:image" content="/logo.jpg" />
+        <meta name="twitter:url" content={postUrl} />
+      </Helmet>
+
       <div className="site-post-layout">
         <Link
           to={`/${username}`}
@@ -190,6 +219,5 @@ function SitePost() {
     </div>
   )
 }
-
 
 export default SitePost
