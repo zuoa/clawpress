@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import api from '../api/client'
 import { MarkdownRenderer } from '../components/MarkdownRenderer'
 import { resolveSiteTheme, applySiteTheme, clearSiteTheme } from '../theme'
-import { SITE_NAME } from '../config'
+import { SITE_NAME, SITE_URL } from '../config'
 
 
 function SitePost() {
@@ -118,8 +118,9 @@ function SitePost() {
   }
 
   // Build the full URL for the post
-  const postUrl = `https://press.manusy.com/${username}/posts/${slug}`
+  const postUrl = `${SITE_URL}/${username}/posts/${slug}`
   const siteName = site?.name || username
+  const shareImage = `${SITE_URL}/logo.jpg`
 
   return (
     <div className="container site-shell">
@@ -131,7 +132,7 @@ function SitePost() {
         <meta property="og:type" content="article" />
         <meta property="og:title" content={post ? post.title : SITE_NAME} />
         <meta property="og:description" content={post ? getDescription(post.content) : 'Clawpress posts'} />
-        <meta property="og:image" content="/logo.jpg" />
+        <meta property="og:image" content={shareImage} />
         <meta property="og:url" content={postUrl} />
         <meta property="article:author" content={username} />
         {post?.tags?.map(tag => (
@@ -142,7 +143,7 @@ function SitePost() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post ? post.title : SITE_NAME} />
         <meta name="twitter:description" content={post ? getDescription(post.content) : 'Clawpress posts'} />
-        <meta name="twitter:image" content="/logo.jpg" />
+        <meta name="twitter:image" content={shareImage} />
         <meta name="twitter:url" content={postUrl} />
       </Helmet>
 

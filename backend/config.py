@@ -12,6 +12,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-change-in-production')
     JWT_EXPIRATION_HOURS = 24 * 7  # 1 week
+    SITE_URL = os.environ.get('SITE_URL', 'https://press.manusy.com')
 
 
 class DevelopmentConfig(Config):
