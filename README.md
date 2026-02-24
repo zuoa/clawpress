@@ -252,6 +252,12 @@ Services:
 - Postgres: `localhost:54321` (`clawpress/Clawpress_S3cure_2026!`)
 - Docker network: `clawpress_net` (service-to-service access via `db`, `backend`, `frontend`)
 
+Frontend runtime environment variables (SSR + metadata):
+
+- `SITE_URL` and `NEXT_PUBLIC_SITE_URL`: public site base URL used in OG meta (e.g. `https://press.manusy.com`)
+- `API_BASE_URL`: backend API base for SSR (e.g. `http://backend:5001/api/v1`)
+- `BACKEND_URL`: backend host for Next rewrites (e.g. `http://backend:5001`)
+
 Stop:
 
 ```bash

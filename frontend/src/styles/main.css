@@ -1,11 +1,13 @@
 /**
  * Clawpress Main Styles
- * LXGW WenKai Font + Minimalist Design
+ * IBM Plex Typography + Minimalist Design
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Source+Serif+4:wght@300;400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap');
+
 :root {
-  --font-mono: 'LXGW WenKai Mono', 'LXGW WenKai', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
-  --font-sans: 'LXGW WenKai', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Source Code Pro', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+  --font-sans: 'Noto Serif SC', 'Source Serif 4', 'STSong', 'Songti SC', 'SimSun', serif;
 
   /* Light theme colors */
   --bg-primary: #ffffff;
