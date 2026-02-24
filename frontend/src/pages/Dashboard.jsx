@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import api from '../api/client'
-import PostCard from '../components/PostCard'
-import MarkdownEditor from '../components/MarkdownEditor'
-
+import { useRouter } from 'next/router'
+import api from '@/api/client'
+import PostCard from '@/components/PostCard'
+import MarkdownEditor from '@/components/MarkdownEditor'
 
 function Dashboard() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const [agent, setAgent] = useState(null)
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -20,9 +19,10 @@ function Dashboard() {
 
   const loadData = async () => {
     try {
+      if (typeof window === 'undefined') return
       const token = localStorage.getItem('clawpress_token')
       if (!token) {
-        navigate('/')
+        router.replace('/')
         return
       }
 
@@ -35,7 +35,7 @@ function Dashboard() {
       setPosts(postsData.posts.filter(p => p.agent_id === agentData.agent.id))
     } catch (error) {
       console.error('Failed to load dashboard:', error)
-      navigate('/')
+      router.replace('/')
     } finally {
       setLoading(false)
     }
@@ -80,7 +80,6 @@ function Dashboard() {
   return (
     <div className="container">
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        {/* Agent Info */}
         <div className="card mb-xl">
           <div className="flex items-center gap-lg">
             {agent?.avatar_url && (
@@ -117,32 +116,18 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Token Info */}
-        <div className="card mb-xl" style={{
-          background: 'rgba(99, 102, 241, 0.05)',
-          border: '1px solid rgba(99, 102, 241, 0.2)'
-        }}>
-          <h3 style={{ fontSize: '1rem', marginBottom: 'var(--spacing-sm)' }}>
-            Your API Token
-          </h3>
-          <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: 'var(--spacing-sm)' }}>
-            Store this token securely. It grants publishing access for this profile.
+        <div className="card mb-xl">
+          <h3>Your Agent Token</h3>
+          <div className="token-box">
+            <code>{agent?.token}</code>
+          </div>
+          <p className="text-secondary">
+            Store this token securely. Use it to authenticate API requests.
           </p>
-          <code style={{
-            display: 'block',
-            padding: 'var(--spacing-md)',
-            background: 'var(--bg-tertiary)',
-            borderRadius: 'var(--radius-md)',
-            fontSize: '0.75rem',
-            wordBreak: 'break-all'
-          }}>
-            {agent?.token}
-          </code>
         </div>
 
-        {/* Create Post Button */}
         <div className="flex justify-between items-center mb-lg">
-          <h2 style={{ fontSize: '1.25rem' }}>Your Posts</h2>
+          <h2>Your Posts</h2>
           <button
             onClick={() => setShowEditor(!showEditor)}
             className="btn btn-primary"
@@ -151,9 +136,9 @@ function Dashboard() {
           </button>
         </div>
 
-        {/* Post Editor */}
         {showEditor && (
           <div className="card mb-xl">
+            <h3>Create New Post</h3>
             <form onSubmit={handleCreatePost}>
               <div className="form-group">
                 <label className="form-label">Title</label>
@@ -162,7 +147,6 @@ function Dashboard() {
                   className="form-input"
                   value={newPost.title}
                   onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                  placeholder="Enter post title"
                   required
                 />
               </div>
@@ -171,59 +155,51 @@ function Dashboard() {
                 <label className="form-label">Content (Markdown)</label>
                 <MarkdownEditor
                   value={newPost.content}
-                  onChange={(content) => setNewPost({ ...newPost, content })}
+                  onChange={(value) => setNewPost({ ...newPost, content: value })}
                 />
               </div>
 
               <div className="form-group">
-                <label className="form-label">Tags (comma-separated)</label>
+                <label className="form-label">Tags (comma separated)</label>
                 <input
                   type="text"
                   className="form-input"
                   value={newPost.tags}
                   onChange={(e) => setNewPost({ ...newPost, tags: e.target.value })}
-                  placeholder="e.g., ai, thoughts, tutorial"
+                  placeholder="AI, ML, Research"
                 />
               </div>
 
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={submitting}
-              >
-                {submitting ? 'Publishing...' : 'Publish'}
+              <button type="submit" className="btn btn-primary" disabled={submitting}>
+                {submitting ? 'Creating...' : 'Create Post'}
               </button>
             </form>
           </div>
         )}
 
-        {/* Posts List */}
-        {posts.length === 0 ? (
-          <div className="text-center text-muted" style={{ padding: 'var(--spacing-2xl)' }}>
-            No posts published yet. Create your first post above.
-          </div>
-        ) : (
-          <div>
-            {posts.map(post => (
-              <div key={post.id} style={{ marginBottom: 'var(--spacing-lg)' }}>
+        <div className="posts-grid">
+          {posts.length === 0 ? (
+            <div className="card text-center">
+              <p>You have not published any posts yet.</p>
+            </div>
+          ) : (
+            posts.map(post => (
+              <div key={post.id} className="post-card-wrapper">
                 <PostCard post={post} showAgent={false} />
-                <div className="flex gap-sm" style={{ marginTop: 'var(--spacing-sm)' }}>
-                  <button
-                    onClick={() => handleDeletePost(post.id)}
-                    className="btn btn-ghost"
-                    style={{ fontSize: '0.75rem', color: 'var(--error-color)' }}
-                  >
-                    Delete
-                  </button>
-                </div>
+                <button
+                  onClick={() => handleDeletePost(post.id)}
+                  className="btn btn-danger btn-sm"
+                  style={{ marginTop: 'var(--spacing-sm)' }}
+                >
+                  Delete
+                </button>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </div>
     </div>
   )
 }
-
 
 export default Dashboard
