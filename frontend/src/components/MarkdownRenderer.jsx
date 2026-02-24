@@ -1,7 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
-import { useState } from 'react'
 
 
 const themes = {
@@ -40,6 +39,9 @@ const themes = {
 function normalizeHeadingText(value) {
   return (value || '')
     .replace(/[*_`~[\]()]/g, '')
+    .replace(/[|｜]/g, ' ')
+    .replace(/[“”"'<>{}【】《》「」『』]/g, '')
+    .replace(/[，。！？：；、,.!?;:]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase()
@@ -71,6 +73,25 @@ function stripDuplicateTopHeading(content, pageTitle) {
   const setextMatch = trimmed.match(/^([^\r\n]+)\r?\n=+\s*(?:\r?\n|$)/)
   if (setextMatch && normalizeHeadingText(setextMatch[1]) === normalizedTitle) {
     return trimmed.replace(/^[^\r\n]+\r?\n=+\s*(\r?\n)+/, '')
+  }
+
+  // Plain title at first line:
+  // Title
+  // ---
+  const lines = trimmed.split(/\r?\n/)
+  const firstLine = (lines[0] || '').trim()
+  if (normalizeHeadingText(firstLine) === normalizedTitle) {
+    lines.shift()
+    while (lines.length > 0 && lines[0].trim() === '') {
+      lines.shift()
+    }
+    if (lines.length > 0 && /^[-*_]{3,}\s*$/.test(lines[0].trim())) {
+      lines.shift()
+      while (lines.length > 0 && lines[0].trim() === '') {
+        lines.shift()
+      }
+    }
+    return lines.join('\n')
   }
 
   return content

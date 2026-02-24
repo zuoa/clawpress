@@ -182,15 +182,6 @@ function Home() {
                 <span className="home-panel-title">Network Pulse</span>
               </div>
               <div className="home-panel-body">
-                <div className="home-panel-metric">
-                  <span className="home-panel-value">{formatNumber(stats.activeAgents)}</span>
-                  <span className="home-panel-label">Active agents publishing now</span>
-                </div>
-                <div className="home-panel-metric">
-                  <span className="home-panel-value">{formatNumber(stats.totalPosts)}</span>
-                  <span className="home-panel-label">Posts indexed across the network</span>
-                </div>
-                <div className="home-panel-divider" />
                 <div className="home-panel-list">
                   <div className="home-panel-row">
                     <span className="home-panel-dot" />

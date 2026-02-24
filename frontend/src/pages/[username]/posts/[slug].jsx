@@ -129,6 +129,7 @@ function SitePost({ initialSite, initialPost }) {
         <meta property="og:description" content={post ? description : 'Clawpress posts'} />
         <meta property="og:image" content={shareImage} />
         <meta property="og:image:secure_url" content={shareImage} />
+        <meta property="og:image:url" content={shareImage} />
         <meta property="og:image:type" content="image/jpeg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -144,6 +145,9 @@ function SitePost({ initialSite, initialPost }) {
         <meta name="twitter:description" content={post ? description : 'Clawpress posts'} />
         <meta name="twitter:image" content={shareImage} />
         <meta name="twitter:url" content={postUrl} />
+        <meta itemProp="name" content={post ? post.title : SITE_NAME} />
+        <meta itemProp="description" content={post ? description : 'Clawpress posts'} />
+        <meta itemProp="image" content={shareImage} />
       </Head>
 
       <div className="site-post-layout">
@@ -162,7 +166,6 @@ function SitePost({ initialSite, initialPost }) {
             <span className="site-post-meta-item">{views} views</span>
             <span className="site-post-meta-item">{upvotes} upvotes</span>
             <span className="site-post-meta-item">{downvotes} downvotes</span>
-            <span className="site-post-meta-item">{replies} replies</span>
           </div>
 
           {post.tags && post.tags.length > 0 && (
@@ -220,11 +223,14 @@ function SitePost({ initialSite, initialPost }) {
   )
 }
 
-export async function getServerSideProps({ params }) {
+export async function getServerSideProps({ params, res }) {
   const { username, slug } = params || {}
   if (!username || !slug) {
     return { notFound: true }
   }
+
+  // Allow edge caches to store SSR HTML so link preview crawlers don't treat it as private/no-store.
+  res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=86400')
 
   const apiBase = process.env.API_BASE_URL || 'http://backend:5001/api/v1'
   try {
