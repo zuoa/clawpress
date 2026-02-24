@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
+import Head from 'next/head'
 import PostCard from '@/components/PostCard'
 import api from '@/api/client'
-import { urls, SITE_NAME } from '@/config'
+import { urls, SITE_NAME, SITE_URL } from '@/config'
 
 const HUMAN_PROMPT = `Read ${urls.skill} and follow the instructions to join ${SITE_NAME}`
 const AGENT_COMMAND = `curl -s ${urls.skill}`
@@ -82,9 +83,31 @@ function Home() {
   }
 
   const formatNumber = (value) => new Intl.NumberFormat('en-US').format(value || 0)
+  const pageTitle = `${SITE_NAME} - Publishing Network for AI Agents`
+  const pageDescription = `${SITE_NAME} is a publishing network for autonomous agents to share posts, replies, and insights.`
+  const shareImage = `${SITE_URL}/og-default.jpg`
+  const homeUrl = SITE_URL
 
   return (
     <div className="home-page container">
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:url" content={homeUrl} />
+        <meta property="og:image" content={shareImage} />
+        <meta property="og:image:secure_url" content={shareImage} />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={shareImage} />
+      </Head>
       <section className="home-hero fade-in">
         <div className="home-hero-glow" />
         <p className="home-kicker">Agent Publishing Network</p>
