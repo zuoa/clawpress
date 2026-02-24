@@ -42,6 +42,11 @@
   --site-muted-text: var(--text-muted);
   --site-tag-bg: var(--bg-tertiary);
   --site-tag-color: var(--text-secondary);
+  --site-reading-text: #2f2d29;
+  --site-reading-heading: #1d1b17;
+  --site-reading-link: #1f4fb3;
+  --site-reading-quote: #6e675d;
+  --site-reading-divider: var(--site-border);
 
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -573,6 +578,11 @@ body[data-site-theme="github"] {
   --site-muted-text: #6e7781;
   --site-tag-bg: #ddf4ff;
   --site-tag-color: #0969da;
+  --site-reading-text: #24292f;
+  --site-reading-heading: #1f2328;
+  --site-reading-link: #0969da;
+  --site-reading-quote: #57606a;
+  --site-reading-divider: #d0d7de;
 }
 
 body[data-site-theme="notion"] {
@@ -596,6 +606,11 @@ body[data-site-theme="notion"] {
   --site-muted-text: #78726d;
   --site-tag-bg: #efece6;
   --site-tag-color: #56524d;
+  --site-reading-text: #37352f;
+  --site-reading-heading: #2f2c27;
+  --site-reading-link: #0b6bcb;
+  --site-reading-quote: #6a645d;
+  --site-reading-divider: #e9e5df;
 }
 
 body[data-site-theme="vsc"] {
@@ -619,6 +634,11 @@ body[data-site-theme="vsc"] {
   --site-muted-text: #7d8590;
   --site-tag-bg: #2d333b;
   --site-tag-color: #8ab4f8;
+  --site-reading-text: #d0d7de;
+  --site-reading-heading: #f0f6fc;
+  --site-reading-link: #8ab4f8;
+  --site-reading-quote: #9da7b3;
+  --site-reading-divider: #30363d;
 }
 
 body[data-site-theme="academic"] {
@@ -642,6 +662,11 @@ body[data-site-theme="academic"] {
   --site-muted-text: #6f675c;
   --site-tag-bg: #ece8e0;
   --site-tag-color: #5f564b;
+  --site-reading-text: #3f3a33;
+  --site-reading-heading: #2e2923;
+  --site-reading-link: #5f564b;
+  --site-reading-quote: #6f675c;
+  --site-reading-divider: #d9d4ca;
 }
 
 /* Site Profile */
@@ -754,42 +779,56 @@ body[data-site-theme="academic"] {
 
 /* Site Post */
 .site-post-layout {
-  max-width: 860px;
+  max-width: 760px;
   margin: 0 auto;
 }
 
 .site-post-back {
   display: inline-flex;
   align-items: center;
-  margin-bottom: var(--spacing-md);
-  font-size: 1.04rem;
+  margin-bottom: 0.9rem;
+  font-size: 0.9rem;
   color: var(--site-soft-text);
 }
 
 .site-post-hero {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: 1.15rem;
   border-bottom: 1px solid var(--site-border);
-  padding-bottom: var(--spacing-md);
+  padding-bottom: 0.95rem;
 }
 
 .site-post-title {
-  font-size: clamp(1.7rem, 3.6vw, 2.55rem);
-  line-height: 1.2;
-  margin-bottom: 0.55rem;
+  font-size: clamp(1.85rem, 3.6vw, 2.75rem);
+  line-height: 1.25;
+  margin-bottom: 0.6rem;
   letter-spacing: -0.01em;
+  color: var(--site-reading-heading);
 }
 
 .site-post-meta-row {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-bottom: 0.75rem;
+  gap: 0.5rem;
+  margin-bottom: 0;
 }
 
 .site-post-meta-item {
   color: var(--site-muted-text);
-  font-size: 1rem;
+  font-size: 0.9rem;
+}
+
+.site-post-meta-dot {
+  color: var(--site-muted-text);
+  font-size: 0.86rem;
+}
+
+.site-post-author-link {
+  text-decoration: none;
+}
+
+.site-post-author-link:hover {
+  text-decoration: underline;
 }
 
 .site-post-tags {
@@ -810,35 +849,72 @@ body[data-site-theme="academic"] {
 
 .site-post-article {
   border: none;
-  padding: 0 0 1.05rem;
-  border-bottom: 1px solid var(--site-border);
-  margin-bottom: var(--spacing-xl);
+  padding: 0 0 1.2rem;
+  border-bottom: 1px solid var(--site-reading-divider);
+  margin-bottom: 1rem;
 }
 
 .site-post-article .markdown-body {
-  font-size: 1.16rem;
+  font-size: 1.12rem;
+  line-height: 1.95;
+  color: var(--site-reading-text);
+}
+
+.site-post-article .markdown-body p,
+.site-post-article .markdown-body li,
+.site-post-article .markdown-body blockquote {
+  line-height: 1.95;
 }
 
 .site-post-article .markdown-body h1 {
-  font-size: 2.2rem;
+  font-size: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 0.9rem;
+  color: var(--site-reading-heading);
 }
 
 .site-post-article .markdown-body h2 {
-  font-size: 1.82rem;
+  font-size: 1.65rem;
+  margin-top: 1.7rem;
+  margin-bottom: 0.8rem;
+  color: var(--site-reading-heading);
 }
 
 .site-post-article .markdown-body h3 {
-  font-size: 1.48rem;
+  font-size: 1.36rem;
+  margin-top: 1.35rem;
+  margin-bottom: 0.7rem;
+  color: var(--site-reading-heading);
+}
+
+.site-post-article .markdown-body a {
+  color: var(--site-reading-link);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.site-post-article .markdown-body blockquote {
+  color: var(--site-reading-quote);
+  border-left-color: var(--site-reading-link);
 }
 
 .site-comments {
   margin-bottom: var(--spacing-xl);
-  font-size: 1.08rem;
+  font-size: 1rem;
   background: color-mix(in srgb, var(--site-card-bg) 82%, var(--site-bg));
   border: 1px solid var(--site-border);
   border-radius: 14px;
   padding: 1rem 1rem 0.4rem;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.site-comments--reading {
+  margin-top: 0.35rem;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
 }
 
 .site-comments-head {

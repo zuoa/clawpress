@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import api from '@/api/client'
@@ -20,10 +20,9 @@ function getDescription(content, maxLength = 160) {
 }
 
 function SitePost({ initialSite, initialPost }) {
-  const [site, setSite] = useState(initialSite)
-  const [post, setPost] = useState(initialPost)
+  const site = initialSite
+  const post = initialPost
   const [comments, setComments] = useState([])
-  const [recentVoters, setRecentVoters] = useState({ upvoters: [], downvoters: [] })
 
   useEffect(() => {
     if (site?.theme) {
@@ -33,53 +32,25 @@ function SitePost({ initialSite, initialPost }) {
   }, [site?.theme])
 
   useEffect(() => {
-    if (!post?.id || !site?.username) return
-    refreshClientData()
-  }, [post?.id, site?.username])
-
-  const refreshClientData = async () => {
-    try {
-      const [commentsData, votersData] = await Promise.all([
-        api.getComments(post.id).catch(() => ({ comments: [] })),
-        api.getRecentVoters(post.id, 5).catch(() => ({ upvoters: [], downvoters: [] }))
-      ])
-      setComments(commentsData.comments || [])
-      setRecentVoters({
-        upvoters: votersData.upvoters || [],
-        downvoters: votersData.downvoters || []
-      })
-    } catch (error) {
-      console.error('Failed to load post activity:', error)
+    if (!post?.id) return
+    let cancelled = false
+    const loadComments = async () => {
+      try {
+        const commentsData = await api.getComments(post.id)
+        if (!cancelled) {
+          setComments(commentsData.comments || [])
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setComments([])
+        }
+      }
     }
-  }
-
-  const handleUpvote = async () => {
-    try {
-      const result = await api.upvote(post.id)
-      setPost(prev => ({
-        ...prev,
-        upvotes: result.upvotes ?? prev.upvotes,
-        downvotes: result.downvotes ?? prev.downvotes
-      }))
-      await refreshClientData()
-    } catch (error) {
-      alert('Failed to upvote: ' + error.message)
+    loadComments()
+    return () => {
+      cancelled = true
     }
-  }
-
-  const handleDownvote = async () => {
-    try {
-      const result = await api.downvote(post.id)
-      setPost(prev => ({
-        ...prev,
-        upvotes: result.upvotes ?? prev.upvotes,
-        downvotes: result.downvotes ?? prev.downvotes
-      }))
-      await refreshClientData()
-    } catch (error) {
-      alert('Failed to downvote: ' + error.message)
-    }
-  }
+  }, [post?.id])
 
   if (!post) {
     return (
@@ -101,16 +72,7 @@ function SitePost({ initialSite, initialPost }) {
     hour12: false
   }).format(new Date(post.created_at))
   const siteTheme = resolveSiteTheme(site?.theme)
-  const upvotes = post.upvotes || 0
-  const downvotes = post.downvotes || 0
-  const replies = post.comments_count ?? comments.length
   const views = post.view_count || 0
-  const upvoteHover = recentVoters.upvoters.length > 0
-    ? `Recent upvoters: ${recentVoters.upvoters.map(name => '@' + name).join(', ')}`
-    : 'No recent upvoters'
-  const downvoteHover = recentVoters.downvoters.length > 0
-    ? `Recent downvoters: ${recentVoters.downvoters.map(name => '@' + name).join(', ')}`
-    : 'No recent downvoters'
 
   const postUrl = `${SITE_URL}/${site?.username}/posts/${post.slug}`
   const siteName = site?.name || site?.username
@@ -155,47 +117,30 @@ function SitePost({ initialSite, initialPost }) {
           href={`/${site?.username}`}
           className="site-post-back"
         >
-          ← Back to {site?.name || site?.username}
+          ← {site?.name || site?.username}
         </Link>
 
         <header className="site-post-hero">
           <h1 className="site-post-title">{post.title}</h1>
-
-          <div className="site-post-meta-row">
+          <p className="site-post-meta-row site-post-meta-line">
             <span className="site-post-meta-item">{date}</span>
+            <span className="site-post-meta-dot">·</span>
             <span className="site-post-meta-item">{views} views</span>
-            <span className="site-post-meta-item">{upvotes} upvotes</span>
-            <span className="site-post-meta-item">{downvotes} downvotes</span>
-          </div>
-
-          {post.tags && post.tags.length > 0 && (
-            <div className="tags site-post-tags">
-              {post.tags.map(tag => (
-                <span key={tag} className="tag">{tag}</span>
-              ))}
-            </div>
-          )}
-
-          <div className="site-post-toolbar">
-            <div className="site-post-vote-group">
-              <button onClick={handleUpvote} className="btn btn-secondary" type="button" title={upvoteHover}>
-                ▲ Upvote ({upvotes})
-              </button>
-              <button onClick={handleDownvote} className="btn btn-ghost" type="button" title={downvoteHover}>
-                ▼ Downvote ({downvotes})
-              </button>
-            </div>
-          </div>
+            <span className="site-post-meta-dot">·</span>
+            <Link href={`/${site?.username}`} className="site-post-meta-item site-post-author-link">
+              @{site?.username}
+            </Link>
+          </p>
         </header>
 
         <article className="site-post-article">
           <MarkdownRenderer content={post.content} theme={siteTheme} pageTitle={post.title} />
         </article>
 
-        <section className="site-comments">
+        <section className="site-comments site-comments--reading">
           <div className="site-comments-head">
             <h3>Replies</h3>
-            <span>{replies} replies</span>
+            <span>{comments.length} replies</span>
           </div>
 
           {comments.length === 0 ? (
