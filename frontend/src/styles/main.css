@@ -888,19 +888,34 @@ body[data-site-theme="academic"] {
 }
 
 .site-post-article .markdown-body {
-  font-size: 1.12rem;
-  line-height: 1.95;
+  font-size: clamp(1.02rem, 0.96rem + 0.24vw, 1.16rem);
+  line-height: 1.9;
+  letter-spacing: 0.01em;
   color: var(--site-reading-text);
 }
 
 .site-post-article .markdown-body p,
 .site-post-article .markdown-body li,
 .site-post-article .markdown-body blockquote {
-  line-height: 1.95;
+  line-height: 1.9;
+}
+
+.site-post-article .markdown-body p {
+  margin-bottom: 1.12rem;
+}
+
+.site-post-article .markdown-body ul,
+.site-post-article .markdown-body ol {
+  margin-bottom: 1.12rem;
+}
+
+.site-post-article .markdown-body li {
+  margin-bottom: 0.38rem;
 }
 
 .site-post-article .markdown-body h1 {
   font-size: 2rem;
+  line-height: 1.35;
   margin-top: 2rem;
   margin-bottom: 0.9rem;
   color: var(--site-reading-heading);
@@ -908,6 +923,7 @@ body[data-site-theme="academic"] {
 
 .site-post-article .markdown-body h2 {
   font-size: 1.65rem;
+  line-height: 1.38;
   margin-top: 1.7rem;
   margin-bottom: 0.8rem;
   color: var(--site-reading-heading);
@@ -915,6 +931,7 @@ body[data-site-theme="academic"] {
 
 .site-post-article .markdown-body h3 {
   font-size: 1.36rem;
+  line-height: 1.42;
   margin-top: 1.35rem;
   margin-bottom: 0.7rem;
   color: var(--site-reading-heading);
@@ -929,6 +946,17 @@ body[data-site-theme="academic"] {
 .site-post-article .markdown-body blockquote {
   color: var(--site-reading-quote);
   border-left-color: var(--site-reading-link);
+  margin: 1.2rem 0;
+  padding-left: 1rem;
+}
+
+.site-post-article .markdown-body pre {
+  margin: 1.2rem 0;
+  border-radius: 10px;
+}
+
+.site-post-article .markdown-body code {
+  font-size: 0.9em;
 }
 
 .site-comments {
@@ -1047,6 +1075,22 @@ body[data-site-theme="academic"] {
 
   .site-comment-actions .btn {
     width: 100%;
+  }
+
+  .site-post-article .markdown-body {
+    line-height: 1.82;
+  }
+
+  .site-post-article .markdown-body h1 {
+    font-size: 1.75rem;
+  }
+
+  .site-post-article .markdown-body h2 {
+    font-size: 1.5rem;
+  }
+
+  .site-post-article .markdown-body h3 {
+    font-size: 1.26rem;
   }
 }
 
