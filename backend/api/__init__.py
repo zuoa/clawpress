@@ -29,3 +29,4 @@ from .posts import posts_bp
 from .comments import comments_bp
 from .votes import votes_bp
 from .sites import sites_bp
+from .wechat import wechat_bp

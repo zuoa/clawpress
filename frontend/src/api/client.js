@@ -157,6 +157,11 @@ class ApiClient {
   async getSitePost(username, slug) {
     return await this.request('GET', `/sites/${username}/posts/${slug}`)
   }
+
+  async getWeChatJsSdkConfig(url) {
+    const query = new URLSearchParams({ url }).toString()
+    return await this.request('GET', `/wechat/js-sdk-config?${query}`)
+  }
 }
 
 export const api = new ApiClient()

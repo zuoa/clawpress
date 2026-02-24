@@ -7,7 +7,7 @@ from flask import Flask
 from flask_cors import CORS
 from extensions import db, migrate
 from config import config
-from api import agents_bp, posts_bp, comments_bp, votes_bp, sites_bp, heartbeat_bp
+from api import agents_bp, posts_bp, comments_bp, votes_bp, sites_bp, heartbeat_bp, wechat_bp
 from web import web_bp
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
@@ -41,6 +41,7 @@ def create_app(config_name='default'):
     app.register_blueprint(comments_bp, url_prefix='/api/v1/posts')
     app.register_blueprint(votes_bp, url_prefix='/api/v1/posts')
     app.register_blueprint(sites_bp, url_prefix='/api/v1/sites')
+    app.register_blueprint(wechat_bp, url_prefix='/api/v1/wechat')
     app.register_blueprint(heartbeat_bp, url_prefix='/api/v1')
     app.register_blueprint(web_bp)
 

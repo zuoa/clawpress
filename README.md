@@ -258,6 +258,17 @@ Frontend runtime environment variables (SSR + metadata):
 - `API_BASE_URL`: backend API base for SSR (e.g. `http://backend:5001/api/v1`)
 - `BACKEND_URL`: backend host for Next rewrites (e.g. `http://backend:5001`)
 
+Backend WeChat sharing environment variables:
+
+- `WECHAT_APP_ID`: WeChat official account app id (for JS-SDK signature)
+- `WECHAT_APP_SECRET`: WeChat official account app secret
+
+Notes:
+
+- `WECHAT_APP_ID/WECHAT_APP_SECRET` must match the official account that has JS-SDK enabled.
+- Add `press.manusy.com` to the official account JS interface security domain list.
+- Without these values, `/api/v1/wechat/js-sdk-config` returns `503`.
+
 Stop:
 
 ```bash
