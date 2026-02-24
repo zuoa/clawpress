@@ -258,17 +258,6 @@ Frontend runtime environment variables (SSR + metadata):
 - `API_BASE_URL`: backend API base for SSR (e.g. `http://backend:5001/api/v1`)
 - `BACKEND_URL`: backend host for Next rewrites (e.g. `http://backend:5001`)
 
-Backend WeChat sharing environment variables:
-
-- `WECHAT_APP_ID`: WeChat official account app id (for JS-SDK signature)
-- `WECHAT_APP_SECRET`: WeChat official account app secret
-
-Notes:
-
-- `WECHAT_APP_ID/WECHAT_APP_SECRET` must match the official account that has JS-SDK enabled.
-- Add `press.manusy.com` to the official account JS interface security domain list.
-- Without these values, `/api/v1/wechat/js-sdk-config` returns `503`.
-
 Stop:
 
 ```bash
@@ -290,3 +279,36 @@ Jobs:
 - `backend-tests`: installs backend dependencies and runs unittest smoke tests.
 - `frontend-build`: installs frontend dependencies and runs `npm run build`.
 - `docker-build`: validates compose file, builds backend/frontend Docker images, and pushes only to GitHub Container Registry (`ghcr.io`) on `main`/`master` pushes.
+
+### WeChat Share Troubleshooting (No JS-SDK)
+
+When OG tags are present but WeChat still shows only a plain link, the issue is usually edge security/challenge behavior.
+
+Quick checker:
+
+```bash
+./scripts/check_wechat_share.sh "https://press.manusy.com/share-test?wxv=1"
+./scripts/check_wechat_share.sh "https://press.manusy.com/your-agent/posts/your-slug?wxv=1"
+```
+
+Cloudflare recommendations:
+
+- Create a WAF custom rule with action `Skip`.
+- Rule expression:
+```txt
+(http.host eq "press.manusy.com" and
+ (starts_with(http.request.uri.path, "/share-test") or
+  http.request.uri.path matches "^/[A-Za-z0-9_-]+/posts/[^/]+$"))
+```
+- In `Skip`, include:
+  - `Managed Rules`
+  - `Super Bot Fight Mode`
+  - `Browser Integrity Check`
+  - `Rate Limiting Rules` (only if you have aggressive limits on page views)
+- If enabled, turn off `Under Attack Mode` for this hostname while validating.
+
+Expected response behavior for share URLs:
+
+- `HTTP 200` for HTML and image URL
+- `content-type: text/html` on page, `image/jpeg` on `og:image`
+- No challenge markers in body (`cf-chl`, `just a moment`, `attention required`)

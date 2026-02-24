@@ -19,41 +19,6 @@ function getDescription(content, maxLength = 160) {
   return plainText.length > maxLength ? plainText.substring(0, maxLength - 3) + '...' : plainText
 }
 
-function isWeChatBrowser() {
-  if (typeof navigator === 'undefined') return false
-  return /MicroMessenger/i.test(navigator.userAgent || '')
-}
-
-function ensureWeChatSdkLoaded() {
-  if (typeof window === 'undefined') {
-    return Promise.reject(new Error('Window is not available'))
-  }
-  if (window.wx) {
-    return Promise.resolve(window.wx)
-  }
-  return new Promise((resolve, reject) => {
-    const existing = document.querySelector('script[data-wechat-sdk="1"]')
-    if (existing) {
-      existing.addEventListener('load', () => resolve(window.wx))
-      existing.addEventListener('error', () => reject(new Error('Failed to load WeChat SDK')))
-      return
-    }
-    const script = document.createElement('script')
-    script.src = 'https://res2.wx.qq.com/open/js/jweixin-1.6.0.js'
-    script.async = true
-    script.setAttribute('data-wechat-sdk', '1')
-    script.onload = () => {
-      if (window.wx) {
-        resolve(window.wx)
-      } else {
-        reject(new Error('WeChat SDK loaded but wx is missing'))
-      }
-    }
-    script.onerror = () => reject(new Error('Failed to load WeChat SDK'))
-    document.head.appendChild(script)
-  })
-}
-
 function SitePost({ initialSite, initialPost }) {
   const [site, setSite] = useState(initialSite)
   const [post, setPost] = useState(initialPost)
@@ -71,62 +36,6 @@ function SitePost({ initialSite, initialPost }) {
     if (!post?.id || !site?.username) return
     refreshClientData()
   }, [post?.id, site?.username])
-
-  useEffect(() => {
-    if (!post?.slug || !site?.username) return
-    if (!isWeChatBrowser()) return
-
-    let cancelled = false
-    const shareTitle = post.title || SITE_NAME
-    const shareDesc = getDescription(post.content, 120)
-    const shareLink = `${SITE_URL}/${site.username}/posts/${post.slug}`
-    const shareImgUrl = `${SITE_URL}/og-default.jpg`
-
-    const setupWeChatShare = async () => {
-      try {
-        await ensureWeChatSdkLoaded()
-        const config = await api.getWeChatJsSdkConfig(window.location.href.split('#')[0])
-        if (cancelled || !window.wx) return
-
-        window.wx.config({
-          debug: false,
-          appId: config.appId,
-          timestamp: Number(config.timestamp),
-          nonceStr: config.nonceStr,
-          signature: config.signature,
-          jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData']
-        })
-
-        const sharePayload = {
-          title: shareTitle,
-          desc: shareDesc,
-          link: shareLink,
-          imgUrl: shareImgUrl
-        }
-
-        window.wx.ready(() => {
-          if (cancelled) return
-          window.wx.updateTimelineShareData({
-            title: shareTitle,
-            link: shareLink,
-            imgUrl: shareImgUrl
-          })
-          window.wx.updateAppMessageShareData(sharePayload)
-        })
-
-        window.wx.error((error) => {
-          console.error('WeChat JS-SDK error:', error)
-        })
-      } catch (error) {
-        console.error('Failed to initialize WeChat sharing:', error)
-      }
-    }
-
-    setupWeChatShare()
-    return () => {
-      cancelled = true
-    }
-  }, [post?.slug, post?.title, post?.content, site?.username])
 
   const refreshClientData = async () => {
     try {
