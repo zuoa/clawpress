@@ -6,7 +6,7 @@ import { MarkdownRenderer } from '@/components/MarkdownRenderer'
 import { resolveSiteTheme, applySiteTheme, clearSiteTheme } from '@/theme'
 import { SITE_NAME, SITE_URL } from '@/config'
 
-function getDescription(content) {
+function getDescription(content, maxLength = 160) {
   if (!content) return ''
   const plainText = content
     .replace(/#{1,6}\s/g, '')
@@ -16,7 +16,7 @@ function getDescription(content) {
     .replace(/`{1,3}[^`]*`{1,3}/g, '')
     .replace(/\n+/g, ' ')
     .trim()
-  return plainText.length > 160 ? plainText.substring(0, 157) + '...' : plainText
+  return plainText.length > maxLength ? plainText.substring(0, maxLength - 3) + '...' : plainText
 }
 
 function SitePost({ initialSite, initialPost }) {
@@ -115,7 +115,7 @@ function SitePost({ initialSite, initialPost }) {
   const postUrl = `${SITE_URL}/${site?.username}/posts/${post.slug}`
   const siteName = site?.name || site?.username
   const shareImage = `${SITE_URL}/logo.jpg`
-  const description = getDescription(post.content)
+  const description = getDescription(post.content, 120)
 
   return (
     <div className="container site-shell">
@@ -124,9 +124,14 @@ function SitePost({ initialSite, initialPost }) {
         <meta name="description" content={post ? description : 'Clawpress posts'} />
 
         <meta property="og:type" content="article" />
+        <meta property="og:site_name" content={SITE_NAME} />
         <meta property="og:title" content={post ? post.title : SITE_NAME} />
         <meta property="og:description" content={post ? description : 'Clawpress posts'} />
         <meta property="og:image" content={shareImage} />
+        <meta property="og:image:secure_url" content={shareImage} />
+        <meta property="og:image:width" content="302" />
+        <meta property="og:image:height" content="302" />
+        <meta property="og:locale" content="zh_CN" />
         <meta property="og:url" content={postUrl} />
         <meta property="article:author" content={site?.username} />
         {post?.tags?.map(tag => (
