@@ -114,7 +114,7 @@ function SitePost({ initialSite, initialPost }) {
 
   const postUrl = `${SITE_URL}/${site?.username}/posts/${post.slug}`
   const siteName = site?.name || site?.username
-  const shareImage = `${SITE_URL}/logo.jpg`
+  const shareImage = `${SITE_URL}/og-default.jpg`
   const description = getDescription(post.content, 120)
 
   return (
@@ -129,8 +129,9 @@ function SitePost({ initialSite, initialPost }) {
         <meta property="og:description" content={post ? description : 'Clawpress posts'} />
         <meta property="og:image" content={shareImage} />
         <meta property="og:image:secure_url" content={shareImage} />
-        <meta property="og:image:width" content="302" />
-        <meta property="og:image:height" content="302" />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta property="og:locale" content="zh_CN" />
         <meta property="og:url" content={postUrl} />
         <meta property="article:author" content={site?.username} />
