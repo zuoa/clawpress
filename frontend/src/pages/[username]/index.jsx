@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import api from '../api/client'
-import { applySiteTheme, clearSiteTheme } from '../theme'
-
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import api from '@/api/client'
+import { applySiteTheme, clearSiteTheme } from '@/theme'
 
 function SiteHome() {
-  const { username } = useParams()
+  const router = useRouter()
+  const { username } = router.query
   const [site, setSite] = useState(null)
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -13,6 +14,7 @@ function SiteHome() {
   const [hasMore, setHasMore] = useState(true)
 
   useEffect(() => {
+    if (!username) return
     loadData()
   }, [username])
 
@@ -97,49 +99,48 @@ function SiteHome() {
 
         <section className="site-profile-posts">
           <h2>Posts</h2>
-        {posts.length === 0 ? (
-          <div className="site-posts-empty">
-            No posts published yet.
-          </div>
-        ) : (
-          <>
-            <div className="site-posts-list">
-              {posts.map((post, index) => (
-                <div key={post.id} className="fade-in" style={{
-                  animationDelay: `${index * 50}ms`
-                }}>
-                  <article className="site-post-row">
-                    <Link to={`/${username}/posts/${post.slug}`} className="site-post-row-title">
-                      {post.title}
-                    </Link>
-                    {post.excerpt && (
-                      <p className="site-post-row-excerpt">{post.excerpt}</p>
-                    )}
-                    <div className="site-post-row-meta">
-                      <span>{new Date(post.created_at).toLocaleDateString('en-US')}</span>
-                      <span>{post.view_count || 0} views</span>
-                    </div>
-                  </article>
-                </div>
-              ))}
+          {posts.length === 0 ? (
+            <div className="site-posts-empty">
+              No posts published yet.
             </div>
-
-            {loading && <div className="loading">Loading...</div>}
-
-            {!loading && hasMore && (
-              <div className="site-posts-load-more">
-                <button onClick={loadMore} className="btn btn-secondary">
-                  Load More
-                </button>
+          ) : (
+            <>
+              <div className="site-posts-list">
+                {posts.map((post, index) => (
+                  <div key={post.id} className="fade-in" style={{
+                    animationDelay: `${index * 50}ms`
+                  }}>
+                    <article className="site-post-row">
+                      <Link href={`/${username}/posts/${post.slug}`} className="site-post-row-title">
+                        {post.title}
+                      </Link>
+                      {post.excerpt && (
+                        <p className="site-post-row-excerpt">{post.excerpt}</p>
+                      )}
+                      <div className="site-post-row-meta">
+                        <span>{new Date(post.created_at).toLocaleDateString('en-US')}</span>
+                        <span>{post.view_count || 0} views</span>
+                      </div>
+                    </article>
+                  </div>
+                ))}
               </div>
-            )}
-          </>
-        )}
+
+              {loading && <div className="loading">Loading...</div>}
+
+              {!loading && hasMore && (
+                <div className="site-posts-load-more">
+                  <button onClick={loadMore} className="btn btn-secondary">
+                    Load More
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </section>
       </div>
     </div>
   )
 }
-
 
 export default SiteHome

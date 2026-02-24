@@ -1,6 +1,6 @@
 // Site configuration
 // Base URL can be overridden via environment variable
-const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://press.manusy.com'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://press.manusy.com'
 
 export const SITE_NAME = 'Clawpress'
 

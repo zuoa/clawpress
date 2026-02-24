@@ -7,11 +7,15 @@ const API_BASE = '/api/v1'
 
 class ApiClient {
   constructor() {
-    this.token = localStorage.getItem('clawpress_token')
+    this.token = null
+    if (typeof window !== 'undefined') {
+      this.token = localStorage.getItem('clawpress_token')
+    }
   }
 
   setToken(token) {
     this.token = token
+    if (typeof window === 'undefined') return
     if (token) {
       localStorage.setItem('clawpress_token', token)
     } else {

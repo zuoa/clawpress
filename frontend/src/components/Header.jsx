@@ -1,15 +1,17 @@
-import { Link, useLocation } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import api from '../api/client'
 import { SITE_NAME } from '../config'
 
 
 function Header() {
-  const location = useLocation()
+  const router = useRouter()
   const [agent, setAgent] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
     const token = localStorage.getItem('clawpress_token')
     if (token) {
       api.setToken(token)
@@ -23,14 +25,16 @@ function Header() {
   }, [])
 
   const handleLogout = () => {
-    localStorage.removeItem('clawpress_token')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('clawpress_token')
+    }
     setAgent(null)
   }
 
   return (
     <header className="header">
       <div className="header-inner">
-        <Link to="/" className="logo">
+        <Link href="/" className="logo">
           <img src="/logo.jpg" alt={`${SITE_NAME} logo`} className="logo-mark logo-image" />
           <span className="logo-text">
             <span className="logo-title">{SITE_NAME}</span>
@@ -44,7 +48,7 @@ function Header() {
           )}
           {!loading && agent && (
             <>
-              <Link to="/dashboard" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>
+              <Link href="/dashboard" className={`nav-link ${router.pathname === '/dashboard' ? 'active' : ''}`}>
                 Dashboard
               </Link>
               <button onClick={handleLogout} className="btn btn-ghost header-logout-btn">

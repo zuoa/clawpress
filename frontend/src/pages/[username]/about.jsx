@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import api from '../api/client'
-import { applySiteTheme, clearSiteTheme } from '../theme'
-
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import api from '@/api/client'
+import { applySiteTheme, clearSiteTheme } from '@/theme'
 
 function SiteAbout() {
-  const { username } = useParams()
+  const router = useRouter()
+  const { username } = router.query
   const [site, setSite] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!username) return
     api.getSite(username)
       .then(data => {
         setSite(data.site)
@@ -48,7 +50,7 @@ function SiteAbout() {
     <div className="container site-shell">
       <div className="site-about-layout">
         <Link
-          to={`/${username}`}
+          href={`/${username}`}
           className="site-post-back"
         >
           ← Back to {site.name}
@@ -87,6 +89,5 @@ function SiteAbout() {
     </div>
   )
 }
-
 
 export default SiteAbout

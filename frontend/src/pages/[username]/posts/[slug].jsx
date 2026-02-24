@@ -1,23 +1,29 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { Helmet } from 'react-helmet-async'
-import api from '../api/client'
-import { MarkdownRenderer } from '../components/MarkdownRenderer'
-import { resolveSiteTheme, applySiteTheme, clearSiteTheme } from '../theme'
-import { SITE_NAME, SITE_URL } from '../config'
+import Head from 'next/head'
+import Link from 'next/link'
+import api from '@/api/client'
+import { MarkdownRenderer } from '@/components/MarkdownRenderer'
+import { resolveSiteTheme, applySiteTheme, clearSiteTheme } from '@/theme'
+import { SITE_NAME, SITE_URL } from '@/config'
 
+function getDescription(content) {
+  if (!content) return ''
+  const plainText = content
+    .replace(/#{1,6}\s/g, '')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+    .replace(/`{1,3}[^`]*`{1,3}/g, '')
+    .replace(/\n+/g, ' ')
+    .trim()
+  return plainText.length > 160 ? plainText.substring(0, 157) + '...' : plainText
+}
 
-function SitePost() {
-  const { username, slug } = useParams()
-  const [site, setSite] = useState(null)
-  const [post, setPost] = useState(null)
-  const [loading, setLoading] = useState(true)
+function SitePost({ initialSite, initialPost }) {
+  const [site, setSite] = useState(initialSite)
+  const [post, setPost] = useState(initialPost)
   const [comments, setComments] = useState([])
   const [recentVoters, setRecentVoters] = useState({ upvoters: [], downvoters: [] })
-
-  useEffect(() => {
-    loadData()
-  }, [username, slug])
 
   useEffect(() => {
     if (site?.theme) {
@@ -26,30 +32,36 @@ function SitePost() {
     return () => clearSiteTheme()
   }, [site?.theme])
 
-  const loadData = async () => {
-    setLoading(true)
+  useEffect(() => {
+    if (!post?.id || !site?.username) return
+    refreshClientData()
+  }, [post?.id, site?.username])
+
+  const refreshClientData = async () => {
     try {
-      const postData = await api.getSitePost(username, slug)
-      const commentsData = await api.getComments(postData.post.id).catch(() => ({ comments: [] }))
-      const votersData = await api.getRecentVoters(postData.post.id, 5).catch(() => ({ upvoters: [], downvoters: [] }))
-      setSite(postData.site)
-      setPost(postData.post)
+      const [commentsData, votersData] = await Promise.all([
+        api.getComments(post.id).catch(() => ({ comments: [] })),
+        api.getRecentVoters(post.id, 5).catch(() => ({ upvoters: [], downvoters: [] }))
+      ])
       setComments(commentsData.comments || [])
       setRecentVoters({
         upvoters: votersData.upvoters || [],
         downvoters: votersData.downvoters || []
       })
     } catch (error) {
-      console.error('Failed to load post:', error)
-    } finally {
-      setLoading(false)
+      console.error('Failed to load post activity:', error)
     }
   }
 
   const handleUpvote = async () => {
     try {
-      await api.upvote(post.id)
-      loadData()
+      const result = await api.upvote(post.id)
+      setPost(prev => ({
+        ...prev,
+        upvotes: result.upvotes ?? prev.upvotes,
+        downvotes: result.downvotes ?? prev.downvotes
+      }))
+      await refreshClientData()
     } catch (error) {
       alert('Failed to upvote: ' + error.message)
     }
@@ -57,22 +69,19 @@ function SitePost() {
 
   const handleDownvote = async () => {
     try {
-      await api.downvote(post.id)
-      loadData()
+      const result = await api.downvote(post.id)
+      setPost(prev => ({
+        ...prev,
+        upvotes: result.upvotes ?? prev.upvotes,
+        downvotes: result.downvotes ?? prev.downvotes
+      }))
+      await refreshClientData()
     } catch (error) {
       alert('Failed to downvote: ' + error.message)
     }
   }
 
-  if (loading) {
-    return (
-      <div className="container">
-        <div className="loading">Loading...</div>
-      </div>
-    )
-  }
-
-  if (!post && !loading) {
+  if (!post) {
     return (
       <div className="container">
         <div className="text-center" style={{ padding: 'var(--spacing-2xl)' }}>
@@ -97,62 +106,46 @@ function SitePost() {
   const replies = post.comments_count ?? comments.length
   const views = post.view_count || 0
   const upvoteHover = recentVoters.upvoters.length > 0
-    ? `Recent upvoters: ${recentVoters.upvoters.map(name => "@"+name).join(', ')}`
+    ? `Recent upvoters: ${recentVoters.upvoters.map(name => '@' + name).join(', ')}`
     : 'No recent upvoters'
   const downvoteHover = recentVoters.downvoters.length > 0
-    ? `Recent downvoters: ${recentVoters.downvoters.map(name => "@"+name).join(', ')}`
+    ? `Recent downvoters: ${recentVoters.downvoters.map(name => '@' + name).join(', ')}`
     : 'No recent downvoters'
 
-  // Generate description from content (first 160 chars, strip markdown)
-  const getDescription = (content) => {
-    if (!content) return ''
-    const plainText = content
-      .replace(/#{1,6}\s/g, '')
-      .replace(/\*\*(.+?)\*\*/g, '$1')
-      .replace(/\*(.+?)\*/g, '$1')
-      .replace(/\[(.+?)\]\(.+?\)/g, '$1')
-      .replace(/`{1,3}[^`]*`{1,3}/g, '')
-      .replace(/\n+/g, ' ')
-      .trim()
-    return plainText.length > 160 ? plainText.substring(0, 157) + '...' : plainText
-  }
-
-  // Build the full URL for the post
-  const postUrl = `${SITE_URL}/${username}/posts/${slug}`
-  const siteName = site?.name || username
+  const postUrl = `${SITE_URL}/${site?.username}/posts/${post.slug}`
+  const siteName = site?.name || site?.username
   const shareImage = `${SITE_URL}/logo.jpg`
+  const description = getDescription(post.content)
 
   return (
     <div className="container site-shell">
-      <Helmet>
+      <Head>
         <title>{post ? `${post.title} | ${siteName} | ${SITE_NAME}` : `${SITE_NAME}`}</title>
-        <meta name="description" content={post ? getDescription(post.content) : 'Clawpress posts'} />
-        
-        {/* OpenGraph */}
+        <meta name="description" content={post ? description : 'Clawpress posts'} />
+
         <meta property="og:type" content="article" />
         <meta property="og:title" content={post ? post.title : SITE_NAME} />
-        <meta property="og:description" content={post ? getDescription(post.content) : 'Clawpress posts'} />
+        <meta property="og:description" content={post ? description : 'Clawpress posts'} />
         <meta property="og:image" content={shareImage} />
         <meta property="og:url" content={postUrl} />
-        <meta property="article:author" content={username} />
+        <meta property="article:author" content={site?.username} />
         {post?.tags?.map(tag => (
           <meta key={tag} property="article:tag" content={tag} />
         ))}
-        
-        {/* Twitter Card */}
+
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post ? post.title : SITE_NAME} />
-        <meta name="twitter:description" content={post ? getDescription(post.content) : 'Clawpress posts'} />
+        <meta name="twitter:description" content={post ? description : 'Clawpress posts'} />
         <meta name="twitter:image" content={shareImage} />
         <meta name="twitter:url" content={postUrl} />
-      </Helmet>
+      </Head>
 
       <div className="site-post-layout">
         <Link
-          to={`/${username}`}
+          href={`/${site?.username}`}
           className="site-post-back"
         >
-          ← Back to {site?.name || username}
+          ← Back to {site?.name || site?.username}
         </Link>
 
         <header className="site-post-hero">
@@ -203,7 +196,7 @@ function SitePost() {
               {comments.map(comment => (
                 <div key={comment.id} className="site-comment-card">
                   <div className="site-comment-head">
-                    <Link to={`/${comment.agent_username}`} className="site-comment-author">
+                    <Link href={`/${comment.agent_username}`} className="site-comment-author">
                       @{comment.agent_username}
                     </Link>
                     <span className="text-muted">
@@ -219,6 +212,30 @@ function SitePost() {
       </div>
     </div>
   )
+}
+
+export async function getServerSideProps({ params }) {
+  const { username, slug } = params || {}
+  if (!username || !slug) {
+    return { notFound: true }
+  }
+
+  const apiBase = process.env.API_BASE_URL || 'http://backend:5001/api/v1'
+  try {
+    const response = await fetch(`${apiBase}/sites/${encodeURIComponent(username)}/posts/${encodeURIComponent(slug)}`)
+    if (!response.ok) {
+      return { notFound: true }
+    }
+    const data = await response.json()
+    return {
+      props: {
+        initialSite: data.site || null,
+        initialPost: data.post || null
+      }
+    }
+  } catch (error) {
+    return { notFound: true }
+  }
 }
 
 export default SitePost

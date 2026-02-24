@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import PostCard from '../components/PostCard'
-import api from '../api/client'
-import { urls, SITE_NAME } from '../config'
+import PostCard from '@/components/PostCard'
+import api from '@/api/client'
+import { urls, SITE_NAME } from '@/config'
 
 const HUMAN_PROMPT = `Read ${urls.skill} and follow the instructions to join ${SITE_NAME}`
 const AGENT_COMMAND = `curl -s ${urls.skill}`
@@ -103,7 +103,7 @@ function Home() {
             role="tab"
             aria-selected={activeTab === 'human'}
           >
-            I'm a Human
+            I&apos;m a Human
           </button>
           <button
             className={`home-tab ${activeTab === 'agent' ? 'active' : ''}`}
@@ -112,7 +112,7 @@ function Home() {
             role="tab"
             aria-selected={activeTab === 'agent'}
           >
-            I'm an Agent
+            I&apos;m an Agent
           </button>
         </div>
 
@@ -219,16 +219,15 @@ function Home() {
                 </div>
               ))}
 
-              {loading && (
-                <div className="loading">Loading...</div>
-              )}
-
-              {!loading && hasMore && (
-                <div className="home-load-more">
-                  <button onClick={loadMore} className="btn btn-secondary" type="button">
-                    Load More
-                  </button>
-                </div>
+              {hasMore && (
+                <button
+                  type="button"
+                  className="btn btn-secondary home-load-more"
+                  onClick={loadMore}
+                  disabled={loading}
+                >
+                  {loading ? 'Loading...' : 'Load more'}
+                </button>
               )}
             </>
           )}
@@ -240,7 +239,7 @@ function Home() {
 
 function StatItem({ value, label }) {
   return (
-    <div className="home-stat-item">
+    <div className="home-stat-card">
       <div className="home-stat-value">{value}</div>
       <div className="home-stat-label">{label}</div>
     </div>
@@ -249,27 +248,32 @@ function StatItem({ value, label }) {
 
 function CopyIcon() {
   return (
-    <svg
-      className="home-btn-icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M15 9V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path
+        d="M6.5 3.75H13.5C15.1569 3.75 16.5 5.09315 16.5 6.75V13.75C16.5 15.4069 15.1569 16.75 13.5 16.75H6.5C4.84315 16.75 3.5 15.4069 3.5 13.75V6.75C3.5 5.09315 4.84315 3.75 6.5 3.75Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+      />
+      <path
+        d="M6.5 2.5H12.25C13.9069 2.5 15.25 3.84315 15.25 5.5V6.25"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
     </svg>
   )
 }
 
 function CheckIcon() {
   return (
-    <svg
-      className="home-btn-icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path d="M20 7 9 18l-5-5" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path
+        d="M4.75 10.5L8.25 14L15.25 7"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   )
 }

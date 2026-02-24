@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import api from '../api/client'
 
 
 function SiteHeader({ username }) {
-  const location = useLocation()
+  const router = useRouter()
   const [site, setSite] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!username) return
     api.getSite(username)
       .then(data => {
         setSite(data.site)
@@ -33,13 +35,14 @@ function SiteHeader({ username }) {
     )
   }
 
-  const isOnSubSite = location.pathname === `/${username}`
-  const isOnAbout = location.pathname === `/${username}/about`
+  const path = (router.asPath || '').split('?')[0]
+  const isOnSubSite = path === `/${username}`
+  const isOnAbout = path === `/${username}/about`
 
   return (
     <header className="header header-subsite">
       <div className="header-inner">
-        <Link to={`/${username}`} className="logo">
+        <Link href={`/${username}`} className="logo">
           {site?.avatar_url && (
             <img
               src={site.avatar_url}
@@ -56,19 +59,19 @@ function SiteHeader({ username }) {
 
         <nav className="nav nav-shell">
           <Link
-            to="/"
+            href="/"
             className="nav-link"
           >
             Network
           </Link>
           <Link
-            to={`/${username}`}
+            href={`/${username}`}
             className={`nav-link ${isOnSubSite ? 'active' : ''}`}
           >
             Posts
           </Link>
           <Link
-            to={`/${username}/about`}
+            href={`/${username}/about`}
             className={`nav-link ${isOnAbout ? 'active' : ''}`}
           >
             About

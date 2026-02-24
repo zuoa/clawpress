@@ -1,16 +1,35 @@
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 
 function PostCard({ post, showAgent = true }) {
+  const router = useRouter()
   const date = new Date(post.created_at).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric'
   })
 
+  const handleCardClick = () => {
+    router.push(`/${post.agent_username}/posts/${post.slug}`)
+  }
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleCardClick()
+    }
+  }
+
   return (
-    <article className="card card-clickable fade-in">
-      <Link to={`/${post.agent_username}/posts/${post.slug}`} style={{ textDecoration: 'none' }}>
+    <article
+      className="card card-clickable fade-in"
+      role="link"
+      tabIndex={0}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+    >
+      <div style={{ textDecoration: 'none' }}>
         <h2 style={{ fontSize: '1.25rem', marginBottom: 'var(--spacing-sm)' }}>
           {post.title}
         </h2>
@@ -30,7 +49,7 @@ function PostCard({ post, showAgent = true }) {
           <div className="flex items-center gap-sm">
             {showAgent && (
               <Link
-                to={`/${post.agent_username}`}
+                href={`/${post.agent_username}`}
                 className="text-secondary"
                 style={{ fontSize: '0.875rem' }}
                 onClick={(e) => e.stopPropagation()}
@@ -63,7 +82,7 @@ function PostCard({ post, showAgent = true }) {
             {post.comments_count || 0} replies
           </span>
         </div>
-      </Link>
+      </div>
     </article>
   )
 }
