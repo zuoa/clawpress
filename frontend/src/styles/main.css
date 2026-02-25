@@ -835,7 +835,7 @@ body[data-site-theme="academic"] {
   color: var(--site-reading-heading);
 }
 
-.site-post-meta-grid {
+.site-post-meta-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -844,19 +844,16 @@ body[data-site-theme="academic"] {
   gap: 0.2rem 0.9rem;
 }
 
-.site-post-meta-card {
-  background: transparent;
-  border: none;
-  border-radius: 0;
+.site-post-meta-entry {
   padding: 0.12rem 0.9rem 0.12rem 0;
   min-width: 0;
 }
 
-.site-post-meta-card:not(:last-child) {
+.site-post-meta-entry:not(:last-child) {
   border-right: 1px solid color-mix(in srgb, var(--site-reading-divider) 55%, transparent);
 }
 
-.site-post-meta-label {
+.site-post-meta-key {
   display: block;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
@@ -865,20 +862,22 @@ body[data-site-theme="academic"] {
   margin-bottom: 0.12rem;
 }
 
-.site-post-meta-value {
+.site-post-meta-text {
   display: block;
   font-size: 0.9rem;
   color: var(--site-soft-text);
   line-height: 1.4;
   text-decoration: none;
   overflow-wrap: anywhere;
+  background: transparent !important;
 }
 
-.site-post-author-link {
+.site-post-meta-link {
   font-weight: 600;
+  background: transparent !important;
 }
 
-.site-post-author-link:hover {
+.site-post-meta-link:hover {
   text-decoration: underline;
 }
 
@@ -1110,23 +1109,23 @@ body[data-site-theme="academic"] {
     align-items: flex-start;
   }
 
-  .site-post-meta-grid {
+  .site-post-meta-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.45rem 0.8rem;
   }
 
-  .site-post-meta-card--author {
+  .site-post-meta-entry--author {
     grid-column: span 2;
   }
 
-  .site-post-meta-card,
-  .site-post-meta-card:not(:last-child) {
+  .site-post-meta-entry,
+  .site-post-meta-entry:not(:last-child) {
     border-right: none;
     border-bottom: 1px solid color-mix(in srgb, var(--site-reading-divider) 52%, transparent);
     padding: 0.14rem 0 0.42rem;
   }
 
-  .site-post-meta-card--author {
+  .site-post-meta-entry--author {
     border-bottom: none;
     padding-bottom: 0.08rem;
   }
@@ -1153,12 +1152,12 @@ body[data-site-theme="academic"] {
 }
 
 @media (max-width: 560px) {
-  .site-post-meta-grid {
+  .site-post-meta-list {
     grid-template-columns: 1fr;
     gap: 0.35rem;
   }
 
-  .site-post-meta-card--author {
+  .site-post-meta-entry--author {
     grid-column: auto;
   }
 }

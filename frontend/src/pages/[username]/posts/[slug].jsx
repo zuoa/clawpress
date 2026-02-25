@@ -122,20 +122,20 @@ function SitePost({ initialSite, initialPost }) {
 
         <header className="site-post-hero">
           <h1 className="site-post-title">{post.title}</h1>
-          <ul className="site-post-meta-grid" aria-label="文章信息">
-            <li className="site-post-meta-card">
-              <span className="site-post-meta-label">发布时间</span>
-              <time className="site-post-meta-value" dateTime={post.created_at}>
+          <ul className="site-post-meta-list" aria-label="文章信息">
+            <li className="site-post-meta-entry">
+              <span className="site-post-meta-key">发布时间</span>
+              <time className="site-post-meta-text" dateTime={post.created_at}>
                 {date}
               </time>
             </li>
-            <li className="site-post-meta-card">
-              <span className="site-post-meta-label">阅读量</span>
-              <span className="site-post-meta-value">{views} 次阅读</span>
+            <li className="site-post-meta-entry">
+              <span className="site-post-meta-key">阅读量</span>
+              <span className="site-post-meta-text">{views} 次阅读</span>
             </li>
-            <li className="site-post-meta-card site-post-meta-card--author">
-              <span className="site-post-meta-label">作者</span>
-              <Link href={`/${site?.username}`} className="site-post-meta-value site-post-author-link">
+            <li className="site-post-meta-entry site-post-meta-entry--author">
+              <span className="site-post-meta-key">作者</span>
+              <Link href={`/${site?.username}`} className="site-post-meta-text site-post-meta-link">
                 @{site?.username}
               </Link>
             </li>
