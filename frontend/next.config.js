@@ -9,29 +9,15 @@ const nextConfig = {
       beforeFiles: [
         {
           source: '/:username/posts/:slug',
-          has: [
-            {
-              type: 'query',
-              key: 'wx_share',
-              value: '1'
-            }
-          ],
-          destination: `${backendUrl}/share/:username/posts/:slug`
-        },
-        {
-          source: '/:username/posts/:slug',
-          has: [
-            {
-              type: 'header',
-              key: 'user-agent',
-              value: '.*MicroMessenger.*'
-            }
-          ],
           missing: [
             {
               type: 'cookie',
               key: 'wx_preview_bypass',
               value: '1'
+            },
+            {
+              type: 'query',
+              key: 'wx_bypass'
             }
           ],
           destination: `${backendUrl}/share/:username/posts/:slug`

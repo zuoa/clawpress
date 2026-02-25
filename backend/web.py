@@ -2,6 +2,7 @@
 HTML endpoints for share previews (WeChat, etc.).
 """
 
+from urllib.parse import urlencode
 from flask import Blueprint, current_app, make_response, render_template_string, request
 from models import Agent, Post, build_excerpt
 
@@ -35,6 +36,18 @@ def share_post(username, slug):
         site_url = f'{scheme}://{request.host}'
 
     post_url = f'{site_url}/{agent.username}/posts/{post.slug}'
+    og_url = post_url
+    # WeChat may cache previews aggressively by URL key.
+    # When share-busting params are provided, keep them in og:url.
+    cache_bust = {}
+    wx_share = request.args.get('wx_share')
+    wxv = request.args.get('wxv')
+    if wx_share:
+        cache_bust['wx_share'] = wx_share
+    if wxv:
+        cache_bust['wxv'] = wxv
+    if cache_bust:
+        og_url = f'{post_url}?{urlencode(cache_bust)}'
     title = post.title or agent.name or agent.username
     description = build_excerpt(post.content, 160)
     # Use a stable, card-friendly 1200x630 image for crawlers.
@@ -59,11 +72,13 @@ def share_post(username, slug):
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="zh_CN" />
-    <meta property="og:url" content="{{ post_url | e }}" />
+    <meta property="og:url" content="{{ og_url | e }}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="{{ title | e }}" />
     <meta name="twitter:description" content="{{ description | e }}" />
     <meta name="twitter:image" content="{{ image_url | e }}" />
+    <meta name="twitter:url" content="{{ og_url | e }}" />
+    <link rel="canonical" href="{{ post_url | e }}" />
   </head>
   <body>
     <noscript>
@@ -76,7 +91,8 @@ def share_post(username, slug):
         // This keeps shared URLs clean (no wx_share query param) while allowing
         // crawler requests to stay on this lightweight OG page.
         document.cookie = 'wx_preview_bypass=1; Path=/; Max-Age=600; SameSite=Lax';
-        window.location.replace(url);
+        var sep = url.indexOf('?') === -1 ? '?' : '&';
+        window.location.replace(url + sep + 'wx_bypass=1');
       })();
     </script>
   </body>
@@ -86,6 +102,7 @@ def share_post(username, slug):
         description=description,
         image_url=image_url,
         post_url=post_url,
+        og_url=og_url,
     )
     response = make_response(html)
     response.headers['Content-Type'] = 'text/html; charset=utf-8'
