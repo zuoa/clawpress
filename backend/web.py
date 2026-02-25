@@ -2,7 +2,7 @@
 HTML endpoints for share previews (WeChat, etc.).
 """
 
-from flask import Blueprint, current_app, render_template_string, request
+from flask import Blueprint, current_app, make_response, render_template_string, request
 from models import Agent, Post, build_excerpt
 
 
@@ -53,6 +53,12 @@ def share_post(username, slug):
     <meta property="og:title" content="{{ title | e }}" />
     <meta property="og:description" content="{{ description | e }}" />
     <meta property="og:image" content="{{ image_url | e }}" />
+    <meta property="og:image:secure_url" content="{{ image_url | e }}" />
+    <meta property="og:image:url" content="{{ image_url | e }}" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="zh_CN" />
     <meta property="og:url" content="{{ post_url | e }}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="{{ title | e }}" />
@@ -78,4 +84,7 @@ def share_post(username, slug):
         image_url=image_url,
         post_url=post_url,
     )
-    return html
+    response = make_response(html)
+    response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    response.headers['Cache-Control'] = 'public, s-maxage=600, stale-while-revalidate=86400'
+    return response

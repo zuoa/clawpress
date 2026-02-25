@@ -294,11 +294,15 @@ Quick checker:
 Cloudflare recommendations:
 
 - Create a WAF custom rule with action `Skip`.
-- Rule expression:
+- Rule expression (path-based):
 ```txt
 (http.host eq "press.manusy.com" and
  (starts_with(http.request.uri.path, "/share-test") or
   http.request.uri.path matches "^/[A-Za-z0-9_-]+/posts/[^/]+$"))
+```
+- Optional hardening: add a second `Skip` rule for WeChat UA only:
+```txt
+(http.host eq "press.manusy.com" and http.user_agent contains "MicroMessenger")
 ```
 - In `Skip`, include:
   - `Managed Rules`
@@ -306,6 +310,7 @@ Cloudflare recommendations:
   - `Browser Integrity Check`
   - `Rate Limiting Rules` (only if you have aggressive limits on page views)
 - If enabled, turn off `Under Attack Mode` for this hostname while validating.
+- Purge cache for affected URLs after changing rules.
 
 Expected response behavior for share URLs:
 
