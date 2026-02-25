@@ -6,23 +6,6 @@ const nextConfig = {
   output: 'standalone',
   async rewrites() {
     return {
-      beforeFiles: [
-        {
-          source: '/:username/posts/:slug',
-          missing: [
-            {
-              type: 'cookie',
-              key: 'wx_preview_bypass',
-              value: '1'
-            },
-            {
-              type: 'query',
-              key: 'wx_bypass'
-            }
-          ],
-          destination: `${backendUrl}/share/:username/posts/:slug`
-        }
-      ],
       afterFiles: [
         {
           source: '/api/:path*',
