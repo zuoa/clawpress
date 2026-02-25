@@ -6,23 +6,44 @@ import { MarkdownRenderer } from '@/components/MarkdownRenderer'
 import { resolveSiteTheme, applySiteTheme, clearSiteTheme } from '@/theme'
 import { SITE_NAME, SITE_URL } from '@/config'
 
-function getDescription(content, maxLength = 160) {
-  if (!content) return ''
-  const plainText = content
+function stripMarkdown(content = '') {
+  return content
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`{1,3}[^`]*`{1,3}/g, ' ')
+    .replace(/!\[(.*?)\]\(.+?\)/g, ' ')
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1')
     .replace(/#{1,6}\s/g, '')
     .replace(/\*\*(.+?)\*\*/g, '$1')
     .replace(/\*(.+?)\*/g, '$1')
-    .replace(/\[(.+?)\]\(.+?\)/g, '$1')
-    .replace(/`{1,3}[^`]*`{1,3}/g, '')
+    .replace(/>\s?/g, '')
+    .replace(/[-*_]{3,}/g, ' ')
     .replace(/\n+/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim()
+}
+
+function getDescription(content, maxLength = 160) {
+  if (!content) return ''
+  const plainText = stripMarkdown(content)
   return plainText.length > maxLength ? plainText.substring(0, maxLength - 3) + '...' : plainText
+}
+
+function getReadingStats(content) {
+  const plainText = stripMarkdown(content)
+  const cjkCount = (plainText.match(/[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/g) || []).length
+  const latinWordCount = (plainText
+    .replace(/[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]/g, ' ')
+    .match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g) || []).length
+  const totalCount = cjkCount + latinWordCount
+  const readMinutes = Math.max(1, Math.ceil((cjkCount / 320) + (latinWordCount / 220)))
+  return { totalCount, readMinutes }
 }
 
 function SitePost({ initialSite, initialPost }) {
   const site = initialSite
   const post = initialPost
   const [comments, setComments] = useState([])
+  const [shareUrl, setShareUrl] = useState('')
 
   useEffect(() => {
     if (site?.theme) {
@@ -52,6 +73,11 @@ function SitePost({ initialSite, initialPost }) {
     }
   }, [post?.id])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    setShareUrl(window.location.href.split('#')[0])
+  }, [site?.username, post?.slug])
+
   if (!post) {
     return (
       <div className="container">
@@ -78,6 +104,9 @@ function SitePost({ initialSite, initialPost }) {
   const siteName = site?.name || site?.username
   const shareImage = `${SITE_URL}/og-default.jpg`
   const description = getDescription(post.content, 120)
+  const readingStats = getReadingStats(post.content)
+  const finalShareUrl = shareUrl || postUrl
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=10&data=${encodeURIComponent(finalShareUrl)}`
 
   return (
     <div className="container site-shell">
@@ -114,13 +143,6 @@ function SitePost({ initialSite, initialPost }) {
       </Head>
 
       <div className="site-post-layout">
-        <Link
-          href={`/${site?.username}`}
-          className="site-post-back"
-        >
-          ← {site?.name || site?.username}
-        </Link>
-
         <header className="site-post-hero">
           <h1 className="site-post-title">{post.title}</h1>
           <ul className="site-post-meta-list" aria-label="文章信息">
@@ -141,6 +163,10 @@ function SitePost({ initialSite, initialPost }) {
               </Link>
             </li>
           </ul>
+          <div className="site-post-reading-stats" aria-label="阅读统计">
+            <span className="site-post-reading-stat">字数 {readingStats.totalCount.toLocaleString('zh-CN')} 字</span>
+            <span className="site-post-reading-stat">预计阅读 {readingStats.readMinutes} 分钟</span>
+          </div>
         </header>
 
         <article className="site-post-article">
@@ -172,6 +198,22 @@ function SitePost({ initialSite, initialPost }) {
               ))}
             </div>
           )}
+        </section>
+
+        <section className="site-post-share" aria-label="扫码分享">
+          <h3>扫码分享本文</h3>
+          <p className="site-post-share-tip">微信或浏览器扫码后可直接打开当前页面。</p>
+          <div className="site-post-share-qr-wrap">
+            <img
+              src={qrCodeUrl}
+              alt="当前文章二维码"
+              className="site-post-share-qr"
+              loading="lazy"
+            />
+          </div>
+          <p className="site-post-share-url">
+            <a href={finalShareUrl}>{finalShareUrl}</a>
+          </p>
         </section>
       </div>
     </div>

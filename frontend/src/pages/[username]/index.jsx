@@ -52,17 +52,53 @@ function SiteHome() {
     }
   }
 
+  const profileHandle = site?.username || (typeof username === 'string' ? username : '')
+  const profileName = site?.name || profileHandle || 'Profile'
+  const isNotFound = !site && !loading
+  const pageTitle = profileHandle
+    ? `${profileName} (@${profileHandle}) | ${SITE_NAME}`
+    : `${profileName} | ${SITE_NAME}`
+  const pageDescription = isNotFound
+    ? `This profile does not exist on ${SITE_NAME}.`
+    : (site?.description || (profileHandle
+      ? `Read posts from @${profileHandle} on ${SITE_NAME}.`
+      : `${SITE_NAME} profile page.`))
+  const canonicalUrl = profileHandle ? `${SITE_URL}/${profileHandle}` : SITE_URL
+  const shareImage = `${SITE_URL}/og-default.jpg`
+
   if (loading && posts.length === 0) {
     return (
       <div className="container">
+        <Head>
+          <title>{pageTitle}</title>
+          <meta name="description" content={pageDescription} />
+          <meta property="og:type" content="profile" />
+          <meta property="og:site_name" content={SITE_NAME} />
+          <meta property="og:title" content={pageTitle} />
+          <meta property="og:description" content={pageDescription} />
+          <meta property="og:url" content={canonicalUrl} />
+          <meta property="og:image" content={shareImage} />
+          <meta property="og:image:secure_url" content={shareImage} />
+          <meta property="og:image:url" content={shareImage} />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={pageTitle} />
+          <meta name="twitter:description" content={pageDescription} />
+          <meta name="twitter:image" content={shareImage} />
+          <link rel="canonical" href={canonicalUrl} />
+        </Head>
         <div className="loading">Loading...</div>
       </div>
     )
   }
 
-  if (!site && !loading) {
+  if (isNotFound) {
     return (
       <div className="container">
+        <Head>
+          <title>{`Profile Not Found | ${SITE_NAME}`}</title>
+          <meta name="description" content={pageDescription} />
+          <meta name="robots" content="noindex,follow" />
+        </Head>
         <div className="text-center" style={{ padding: 'var(--spacing-2xl)' }}>
           <h1>404</h1>
           <p className="text-secondary">Profile not found</p>
@@ -70,17 +106,6 @@ function SiteHome() {
       </div>
     )
   }
-
-  const profileName = site?.name || username || 'Profile'
-  const profileHandle = site?.username || username
-  const pageTitle = profileHandle
-    ? `${profileName} (@${profileHandle}) | ${SITE_NAME}`
-    : `${profileName} | ${SITE_NAME}`
-  const pageDescription = site?.description || (profileHandle
-    ? `Read posts from @${profileHandle} on ${SITE_NAME}.`
-    : `${SITE_NAME} profile page.`)
-  const canonicalUrl = profileHandle ? `${SITE_URL}/${profileHandle}` : SITE_URL
-  const shareImage = `${SITE_URL}/og-default.jpg`
 
   return (
     <div className="container site-shell">
