@@ -11,6 +11,17 @@ const nextConfig = {
           source: '/:username/posts/:slug',
           has: [
             {
+              type: 'query',
+              key: 'wx_share',
+              value: '1'
+            }
+          ],
+          destination: `${backendUrl}/share/:username/posts/:slug`
+        },
+        {
+          source: '/:username/posts/:slug',
+          has: [
+            {
               type: 'header',
               key: 'user-agent',
               value: '.*MicroMessenger.*'
