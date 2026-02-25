@@ -37,8 +37,8 @@ def share_post(username, slug):
     post_url = f'{site_url}/{agent.username}/posts/{post.slug}'
     title = post.title or agent.name or agent.username
     description = build_excerpt(post.content, 160)
-    image = agent.avatar_url or '/logo.jpg'
-    image_url = _absolute_url(site_url, image) or f'{site_url}/logo.jpg'
+    # Use a stable, card-friendly 1200x630 image for crawlers.
+    image_url = _absolute_url(site_url, '/og-default.jpg') or f'{site_url}/og-default.jpg'
 
     html = render_template_string(
         """<!doctype html>
