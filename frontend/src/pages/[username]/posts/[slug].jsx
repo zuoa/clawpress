@@ -19,7 +19,7 @@ function getDescription(content, maxLength = 160) {
   return plainText.length > maxLength ? plainText.substring(0, maxLength - 3) + '...' : plainText
 }
 
-function SitePost({ initialSite, initialPost }) {
+function SitePost({ initialSite, initialPost, initialOgUrl }) {
   const site = initialSite
   const post = initialPost
   const [comments, setComments] = useState([])
@@ -75,6 +75,7 @@ function SitePost({ initialSite, initialPost }) {
   const views = post.view_count || 0
 
   const postUrl = `${SITE_URL}/${site?.username}/posts/${post.slug}`
+  const ogUrl = initialOgUrl || postUrl
   const siteName = site?.name || site?.username
   const shareImage = `${SITE_URL}/og-default.jpg`
   const description = getDescription(post.content, 120)
@@ -96,7 +97,7 @@ function SitePost({ initialSite, initialPost }) {
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:locale" content="zh_CN" />
-        <meta property="og:url" content={postUrl} />
+        <meta property="og:url" content={ogUrl} />
         <meta property="article:author" content={site?.username} />
         {post?.tags?.map(tag => (
           <meta key={tag} property="article:tag" content={tag} />
@@ -106,7 +107,8 @@ function SitePost({ initialSite, initialPost }) {
         <meta name="twitter:title" content={post ? post.title : SITE_NAME} />
         <meta name="twitter:description" content={post ? description : 'Clawpress posts'} />
         <meta name="twitter:image" content={shareImage} />
-        <meta name="twitter:url" content={postUrl} />
+        <meta name="twitter:url" content={ogUrl} />
+        <link rel="canonical" href={postUrl} />
         <meta itemProp="name" content={post ? post.title : SITE_NAME} />
         <meta itemProp="description" content={post ? description : 'Clawpress posts'} />
         <meta itemProp="image" content={shareImage} />
@@ -177,7 +179,7 @@ function SitePost({ initialSite, initialPost }) {
   )
 }
 
-export async function getServerSideProps({ params, res }) {
+export async function getServerSideProps({ params, res, resolvedUrl, query }) {
   const { username, slug } = params || {}
   if (!username || !slug) {
     return { notFound: true }
@@ -193,10 +195,16 @@ export async function getServerSideProps({ params, res }) {
       return { notFound: true }
     }
     const data = await response.json()
+    const hasWxShareQuery = Boolean(query?.wx_share || query?.wxv)
+    const resolvedPath = typeof resolvedUrl === 'string' ? resolvedUrl.split('#')[0] : `/${encodeURIComponent(username)}/posts/${encodeURIComponent(slug)}`
+    const normalizedPath = resolvedPath.startsWith('/') ? resolvedPath : `/${resolvedPath}`
+    const initialOgUrl = hasWxShareQuery ? `${SITE_URL}${normalizedPath}` : null
+
     return {
       props: {
         initialSite: data.site || null,
-        initialPost: data.post || null
+        initialPost: data.post || null,
+        initialOgUrl
       }
     }
   } catch (error) {
