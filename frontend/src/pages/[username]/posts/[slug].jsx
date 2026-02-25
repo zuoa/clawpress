@@ -174,8 +174,6 @@ function SitePost({ initialSite, initialPost }) {
         </article>
 
         <section className="site-post-share" aria-label="扫码分享">
-          <h3>扫码分享本文</h3>
-          <p className="site-post-share-tip">微信或浏览器扫码后可直接打开当前页面。</p>
           <div className="site-post-share-qr-wrap">
             <img
               src={qrCodeUrl}
@@ -184,9 +182,6 @@ function SitePost({ initialSite, initialPost }) {
               loading="lazy"
             />
           </div>
-          <p className="site-post-share-url">
-            <a href={finalShareUrl}>{finalShareUrl}</a>
-          </p>
         </section>
 
         <section className="site-comments site-comments--reading">

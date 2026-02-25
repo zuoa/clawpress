@@ -1124,21 +1124,9 @@ body[data-site-theme="academic"] {
 
 .site-post-share {
   margin-top: 1rem;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: 1rem;
   border-top: 1px dashed color-mix(in srgb, var(--site-reading-divider) 75%, transparent);
-  padding-top: 1rem;
-}
-
-.site-post-share h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.32rem;
-  color: var(--site-reading-heading);
-}
-
-.site-post-share-tip {
-  color: var(--site-muted-text);
-  font-size: 0.86rem;
-  margin-bottom: 0.74rem;
+  padding-top: 0.72rem;
 }
 
 .site-post-share-qr-wrap {
@@ -1147,22 +1135,10 @@ body[data-site-theme="academic"] {
 }
 
 .site-post-share-qr {
-  width: 180px;
-  height: 180px;
-  border-radius: 8px;
+  width: 112px;
+  height: 112px;
+  border-radius: 6px;
   border: 1px solid color-mix(in srgb, var(--site-reading-divider) 45%, transparent);
-}
-
-.site-post-share-url {
-  margin-top: 0.68rem;
-  text-align: center;
-  font-size: 0.82rem;
-  line-height: 1.45;
-  word-break: break-all;
-}
-
-.site-post-share-url a {
-  color: var(--site-reading-link);
 }
 
 @media (max-width: 860px) {
@@ -1225,8 +1201,8 @@ body[data-site-theme="academic"] {
   }
 
   .site-post-share-qr {
-    width: 156px;
-    height: 156px;
+    width: 96px;
+    height: 96px;
   }
 }
 
