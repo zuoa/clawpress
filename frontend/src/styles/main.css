@@ -885,18 +885,20 @@ body[data-site-theme="academic"] {
   margin-top: 0.62rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem 0.6rem;
+  gap: 0.25rem 0.6rem;
 }
 
 .site-post-reading-stat {
   display: inline-flex;
   align-items: center;
-  border: 1px solid color-mix(in srgb, var(--site-reading-divider) 60%, transparent);
-  border-radius: 999px;
-  padding: 0.18rem 0.58rem;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--site-muted-text);
-  background: color-mix(in srgb, var(--site-card-bg) 85%, transparent);
+}
+
+.site-post-reading-stat + .site-post-reading-stat::before {
+  content: '·';
+  margin-right: 0.45rem;
+  color: var(--site-reading-divider);
 }
 
 .site-post-tags {
@@ -1121,12 +1123,10 @@ body[data-site-theme="academic"] {
 }
 
 .site-post-share {
-  margin-top: 0.9rem;
+  margin-top: 1rem;
   margin-bottom: var(--spacing-xl);
-  border: 1px solid color-mix(in srgb, var(--site-reading-divider) 65%, transparent);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--site-card-bg) 84%, transparent);
-  padding: 1rem;
+  border-top: 1px dashed color-mix(in srgb, var(--site-reading-divider) 75%, transparent);
+  padding-top: 1rem;
 }
 
 .site-post-share h3 {
@@ -1150,8 +1150,7 @@ body[data-site-theme="academic"] {
   width: 180px;
   height: 180px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--site-reading-divider) 62%, transparent);
-  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--site-reading-divider) 45%, transparent);
 }
 
 .site-post-share-url {
@@ -1223,10 +1222,6 @@ body[data-site-theme="academic"] {
 
   .site-post-meta-entry--author {
     grid-column: auto;
-  }
-
-  .site-post-share {
-    padding: 0.86rem;
   }
 
   .site-post-share-qr {

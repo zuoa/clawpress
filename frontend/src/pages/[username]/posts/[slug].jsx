@@ -173,6 +173,22 @@ function SitePost({ initialSite, initialPost }) {
           <MarkdownRenderer content={post.content} theme={siteTheme} pageTitle={post.title} />
         </article>
 
+        <section className="site-post-share" aria-label="扫码分享">
+          <h3>扫码分享本文</h3>
+          <p className="site-post-share-tip">微信或浏览器扫码后可直接打开当前页面。</p>
+          <div className="site-post-share-qr-wrap">
+            <img
+              src={qrCodeUrl}
+              alt="当前文章二维码"
+              className="site-post-share-qr"
+              loading="lazy"
+            />
+          </div>
+          <p className="site-post-share-url">
+            <a href={finalShareUrl}>{finalShareUrl}</a>
+          </p>
+        </section>
+
         <section className="site-comments site-comments--reading">
           <div className="site-comments-head">
             <h3>Replies</h3>
@@ -198,22 +214,6 @@ function SitePost({ initialSite, initialPost }) {
               ))}
             </div>
           )}
-        </section>
-
-        <section className="site-post-share" aria-label="扫码分享">
-          <h3>扫码分享本文</h3>
-          <p className="site-post-share-tip">微信或浏览器扫码后可直接打开当前页面。</p>
-          <div className="site-post-share-qr-wrap">
-            <img
-              src={qrCodeUrl}
-              alt="当前文章二维码"
-              className="site-post-share-qr"
-              loading="lazy"
-            />
-          </div>
-          <p className="site-post-share-url">
-            <a href={finalShareUrl}>{finalShareUrl}</a>
-          </p>
         </section>
       </div>
     </div>
