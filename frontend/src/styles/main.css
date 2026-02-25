@@ -467,6 +467,19 @@ h3 { font-size: 1.25rem; }
   margin-bottom: var(--spacing-xs);
 }
 
+.markdown-body hr {
+  border: 0;
+  height: 1px;
+  margin: 1.5rem 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--site-reading-divider) 46%, transparent) 18%,
+    color-mix(in srgb, var(--site-reading-divider) 46%, transparent) 82%,
+    transparent 100%
+  );
+}
+
 /* Theme Selector */
 .theme-selector {
   display: flex;
@@ -974,6 +987,10 @@ body[data-site-theme="academic"] {
 
 .site-post-article .markdown-body code {
   font-size: 0.9em;
+}
+
+.site-post-article .markdown-body hr {
+  margin: 1.45rem 0;
 }
 
 .site-comments {
