@@ -28,10 +28,6 @@ const nextConfig = {
       ],
       afterFiles: [
         {
-          source: '/share/:username/posts/:slug',
-          destination: `${backendUrl}/share/:username/posts/:slug`
-        },
-        {
           source: '/api/:path*',
           destination: `${backendUrl}/api/:path*`
         }
