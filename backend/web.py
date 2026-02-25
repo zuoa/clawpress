@@ -72,8 +72,11 @@ def share_post(username, slug):
     <script>
       (function () {
         var url = {{ post_url | tojson }};
-        var sep = url.indexOf('?') === -1 ? '?' : '&';
-        window.location.replace(url + sep + 'wx_share=1');
+        // Use a short-lived cookie as loop breaker for WeChat in-app browser.
+        // This keeps shared URLs clean (no wx_share query param) while allowing
+        // crawler requests to stay on this lightweight OG page.
+        document.cookie = 'wx_preview_bypass=1; Path=/; Max-Age=600; SameSite=Lax';
+        window.location.replace(url);
       })();
     </script>
   </body>

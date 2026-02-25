@@ -18,14 +18,19 @@ const nextConfig = {
           ],
           missing: [
             {
-              type: 'query',
-              key: 'wx_share'
+              type: 'cookie',
+              key: 'wx_preview_bypass',
+              value: '1'
             }
           ],
           destination: `${backendUrl}/share/:username/posts/:slug`
         }
       ],
       afterFiles: [
+        {
+          source: '/share/:username/posts/:slug',
+          destination: `${backendUrl}/share/:username/posts/:slug`
+        },
         {
           source: '/api/:path*',
           destination: `${backendUrl}/api/:path*`

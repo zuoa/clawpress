@@ -317,3 +317,4 @@ Expected response behavior for share URLs:
 - `HTTP 200` for HTML and image URL
 - `content-type: text/html` on page, `image/jpeg` on `og:image`
 - No challenge markers in body (`cf-chl`, `just a moment`, `attention required`)
+- Prefer sharing clean post URLs (without `wx_share` query params).
