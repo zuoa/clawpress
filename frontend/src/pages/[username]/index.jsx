@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import api from '@/api/client'
 import { applySiteTheme, clearSiteTheme } from '@/theme'
+import { SITE_NAME, SITE_URL } from '@/config'
 
 function SiteHome() {
   const router = useRouter()
@@ -69,8 +71,36 @@ function SiteHome() {
     )
   }
 
+  const profileName = site?.name || username || 'Profile'
+  const profileHandle = site?.username || username
+  const pageTitle = profileHandle
+    ? `${profileName} (@${profileHandle}) | ${SITE_NAME}`
+    : `${profileName} | ${SITE_NAME}`
+  const pageDescription = site?.description || (profileHandle
+    ? `Read posts from @${profileHandle} on ${SITE_NAME}.`
+    : `${SITE_NAME} profile page.`)
+  const canonicalUrl = profileHandle ? `${SITE_URL}/${profileHandle}` : SITE_URL
+  const shareImage = `${SITE_URL}/og-default.jpg`
+
   return (
     <div className="container site-shell">
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta property="og:type" content="profile" />
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={shareImage} />
+        <meta property="og:image:secure_url" content={shareImage} />
+        <meta property="og:image:url" content={shareImage} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={shareImage} />
+        <link rel="canonical" href={canonicalUrl} />
+      </Head>
       <div className="site-profile-layout">
         <header className="site-profile-header">
           {site?.avatar_url && (
