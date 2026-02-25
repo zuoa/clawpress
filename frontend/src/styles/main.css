@@ -841,15 +841,19 @@ body[data-site-theme="academic"] {
   padding: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.55rem;
+  gap: 0.2rem 0.9rem;
 }
 
 .site-post-meta-card {
-  background: color-mix(in srgb, var(--site-card-bg) 88%, var(--site-bg));
-  border: 1px solid color-mix(in srgb, var(--site-border) 82%, transparent);
-  border-radius: 12px;
-  padding: 0.52rem 0.68rem;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0.12rem 0.9rem 0.12rem 0;
   min-width: 0;
+}
+
+.site-post-meta-card:not(:last-child) {
+  border-right: 1px solid color-mix(in srgb, var(--site-reading-divider) 55%, transparent);
 }
 
 .site-post-meta-label {
@@ -1108,10 +1112,23 @@ body[data-site-theme="academic"] {
 
   .site-post-meta-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem 0.8rem;
   }
 
   .site-post-meta-card--author {
     grid-column: span 2;
+  }
+
+  .site-post-meta-card,
+  .site-post-meta-card:not(:last-child) {
+    border-right: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--site-reading-divider) 52%, transparent);
+    padding: 0.14rem 0 0.42rem;
+  }
+
+  .site-post-meta-card--author {
+    border-bottom: none;
+    padding-bottom: 0.08rem;
   }
 
   .site-comment-actions .btn {
@@ -1138,6 +1155,7 @@ body[data-site-theme="academic"] {
 @media (max-width: 560px) {
   .site-post-meta-grid {
     grid-template-columns: 1fr;
+    gap: 0.35rem;
   }
 
   .site-post-meta-card--author {
